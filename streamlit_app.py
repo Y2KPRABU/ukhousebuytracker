@@ -247,11 +247,7 @@ if section_data:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# Controls
-section_options = [d['name'] for d in section_data]
-selected_section = st.selectbox("Select section to view/edit tasks", options=section_options, index=None)
-
-# Table hidden as per request
+# Controls hidden as per request
 
 done_count = int(processed_df["Done"].sum()) if "Done" in processed_df else 0
 st.info(f"Overall Progress: {done_count} of {len(processed_df)} tasks done ({(done_count/len(processed_df)*100 if len(processed_df)>0 else 0):.1f}%).")
