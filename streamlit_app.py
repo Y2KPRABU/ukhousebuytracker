@@ -240,7 +240,11 @@ if section_data:
         # Capture click events from pie chart
         clicked = plotly_events(fig, click_event=True, key='pie_click')
         st.plotly_chart(fig, use_container_width=True)
-        selected_from_pie = clicked[0]['label'] if clicked else None
+        selected_from_pie = None
+        if clicked and isinstance(clicked, list) and len(clicked) > 0:
+            first_event = clicked[0]
+            if isinstance(first_event, dict):
+                selected_from_pie = first_event.get('label') or first_event.get('x') or first_event.get('y')
     else:
         st.plotly_chart(fig, use_container_width=True)
         selected_from_pie = None
