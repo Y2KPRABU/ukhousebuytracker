@@ -209,7 +209,9 @@ color_map = {}
 for i, section_name in enumerate(data.keys()):
     color_map[section_name] = section_colors[i % len(section_colors)]
 
-for section_name in data.keys():
+# Ensure section order exactly follows the JSON definition
+section_order = list(data.keys())
+for section_name in section_order:
     section_df = processed_df[processed_df["Section"] == section_name]
     if not section_df.empty:
         total = len(section_df)
@@ -224,60 +226,89 @@ for section_name in data.keys():
         })
 
 if section_data:
+    section_names = [d['name'] for d in section_data]
+
+    # Ensure a default selected section exists
+    if 'selected_section' not in st.session_state or st.session_state.selected_section not in section_names:
+        st.session_state.selected_section = section_names[0] if section_names else None
+
+    selected_section = st.session_state.selected_section
+
+    # pulled slice to stand out
+    pulls = [0.1 if s == selected_section else 0 for s in section_names]
+
     fig = go.Figure(data=[go.Pie(
-        labels=[d['name'] for d in section_data],
+        labels=section_names,
         values=[d['total'] for d in section_data],
-        textinfo='label+value',
+        textinfo='label+percent',
+        textfont=dict(size=16, color='black', family='Arial', weight='bold'),
         insidetextorientation='radial',
-        marker=dict(colors=[d['color'] for d in section_data])
+        marker=dict(
+            colors=[d['color'] for d in section_data],
+            line=dict(color='white', width=3)
+        ),
+        pull=pulls,
+        hole=0.0,
+        sort=False,
+        direction='clockwise'
     )])
     fig.update_layout(
         showlegend=False,
-        height=400
+        height=420,
+        margin=dict(t=30, b=10, l=10, r=10)
     )
 
+    selected_from_pie = None
     if plotly_events:
-        # Capture click events from pie chart
         clicked = plotly_events(fig, click_event=True, key='pie_click')
-        st.plotly_chart(fig, use_container_width=True)
-        selected_from_pie = None
         if clicked and isinstance(clicked, list) and len(clicked) > 0:
             first_event = clicked[0]
             if isinstance(first_event, dict):
                 selected_from_pie = first_event.get('label') or first_event.get('x') or first_event.get('y')
+                # If label is not directly present but pointNumber exists then map by index
+                if selected_from_pie is None and 'pointNumber' in first_event:
+                    idx = int(first_event['pointNumber'])
+                    if 0 <= idx < len(section_names):
+                        selected_from_pie = section_names[idx]
+        # If no click event yet, use selected section from state
+        if selected_from_pie is None:
+            selected_from_pie = selected_section
+        st.plotly_chart(fig, use_container_width=True)
     else:
         st.plotly_chart(fig, use_container_width=True)
-        selected_from_pie = None
+        selected_from_pie = selected_section
 
-    # Keep selection in session state
-    if 'selected_section' not in st.session_state:
-        st.session_state.selected_section = None
-    if selected_from_pie:
+    # ensure the session value follows pie clicks (and is a valid section)
+    if selected_from_pie in section_names:
         st.session_state.selected_section = selected_from_pie
 
     st.write("---")
     cols = st.columns([1, 1])
-    section_names = [d['name'] for d in section_data]
-    if st.session_state.selected_section in section_names:
-        default_index = section_names.index(st.session_state.selected_section) + 1
-    else:
-        default_index = 0
-
     with cols[0]:
+        # Use a dedicated key so Streamlit preserves the value correctly across reruns
         selected_section = st.selectbox(
             "Select section (or 'All' for everything)",
             options=['All'] + section_names,
-            index=default_index
+            index=0 if st.session_state.selected_section not in section_names else section_names.index(st.session_state.selected_section) + 1,
+            key='selected_section_dropdown'
         )
-    with cols[1]:
-        show_all = st.checkbox("Show all data", value=False)
 
-    # Determine table scope
+        # Store selection back into session state for chart and table logic
+        if selected_section != 'All':
+            st.session_state.selected_section = selected_section
+        else:
+            # Keep the last real section for pie highlighting, but allow all display
+            st.session_state.selected_section = st.session_state.get('selected_section', section_names[0])
+
+    with cols[1]:
+        show_all = st.checkbox("Show all data", value=st.session_state.get('show_all', False))
+        st.session_state.show_all = show_all
+
     if show_all:
         display_df = processed_df
     else:
-        if selected_section == 'All':
-            display_df = pd.DataFrame()
+        if selected_section == 'All' or selected_section is None:
+            display_df = processed_df[processed_df['Section'] == section_names[0]] if section_names else pd.DataFrame()
         else:
             display_df = processed_df[processed_df['Section'] == selected_section]
 
