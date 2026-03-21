@@ -246,12 +246,34 @@ if section_data:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# Section selector
-section_options = [d['name'] for d in section_data] + ["All"]
-selected_section = st.selectbox("Select section to view/edit tasks", options=section_options, index=len(section_options)-1)  # default to "All"
+# Controls
+col1, col2 = st.columns(2)
+with col1:
+    show_all = st.checkbox("Show all tasks in table", value=False)
+with col2:
+    section_options = [d['name'] for d in section_data]
+    selected_section = st.selectbox("Select section to view/edit tasks", options=section_options, index=None)
 
-# Display and edit tasks for selected section
-if selected_section != "All":
+# Display and edit tasks
+if show_all:
+    st.subheader("All Tasks")
+    edited_df = st.data_editor(
+        processed_df,
+        use_container_width=True,
+        num_rows="dynamic",
+        column_config={
+            "Section": st.column_config.TextColumn("Section", disabled=True),
+            "Item": st.column_config.TextColumn("Item", disabled=True),
+            "Done": st.column_config.CheckboxColumn("Done"),
+            "Pending With": st.column_config.TextColumn("Pending With"),
+            "Date Completed": st.column_config.TextColumn("Date Completed"),
+            "Notes": st.column_config.TextColumn("Notes"),
+            "Tested certificate available": st.column_config.CheckboxColumn("Tested certificate available")
+        }
+    )
+    st.session_state.checklist_df = edited_df
+    processed_df = edited_df
+elif selected_section:
     section_df = processed_df[processed_df["Section"] == selected_section].copy()
     st.subheader(f"Edit Tasks in {selected_section}")
     edited_section_df = st.data_editor(
@@ -271,7 +293,7 @@ if selected_section != "All":
     # Update the full df
     mask = st.session_state.checklist_df["Section"] == selected_section
     st.session_state.checklist_df.loc[mask, edited_section_df.columns] = edited_section_df.values
-    processed_df = st.session_state.checklist_df  # update for pie
+    processed_df = st.session_state.checklist_df
 
 done_count = int(processed_df["Done"].sum()) if "Done" in processed_df else 0
 st.info(f"Overall Progress: {done_count} of {len(processed_df)} tasks done ({(done_count/len(processed_df)*100 if len(processed_df)>0 else 0):.1f}%).")
