@@ -273,44 +273,36 @@ if section_data:
         # If no click event yet, use selected section from state
         if selected_from_pie is None:
             selected_from_pie = selected_section
-        st.plotly_chart(fig, use_container_width=True)
     else:
         st.plotly_chart(fig, use_container_width=True)
         selected_from_pie = selected_section
 
     # ensure the session value follows pie clicks (and is a valid section)
     if selected_from_pie in section_names:
-        st.session_state.selected_section = selected_from_pie
+        selected_section = selected_from_pie
+    st.session_state.selected_section = selected_section
 
     st.write("---")
     cols = st.columns([1, 1])
     with cols[0]:
-        # Use a dedicated key so Streamlit preserves the value correctly across reruns
         selected_section = st.selectbox(
             "Select section (or 'All' for everything)",
             options=['All'] + section_names,
-            index=0 if st.session_state.selected_section not in section_names else section_names.index(st.session_state.selected_section) + 1,
-            key='selected_section_dropdown'
+            index=0 if selected_section not in section_names else section_names.index(selected_section) + 1,
+            key='selected_section'
         )
 
-        # Store selection back into session state for chart and table logic
-        if selected_section != 'All':
-            st.session_state.selected_section = selected_section
-        else:
-            # Keep the last real section for pie highlighting, but allow all display
-            st.session_state.selected_section = st.session_state.get('selected_section', section_names[0])
+        # Keep session state in sync so pie and table use the same value
+        st.session_state.selected_section = selected_section
 
     with cols[1]:
         show_all = st.checkbox("Show all data", value=st.session_state.get('show_all', False))
         st.session_state.show_all = show_all
 
-    if show_all:
+    if show_all or selected_section == 'All':
         display_df = processed_df
     else:
-        if selected_section == 'All' or selected_section is None:
-            display_df = processed_df[processed_df['Section'] == section_names[0]] if section_names else pd.DataFrame()
-        else:
-            display_df = processed_df[processed_df['Section'] == selected_section]
+        display_df = processed_df[processed_df['Section'] == selected_section] if selected_section in section_names else pd.DataFrame()
 
     if not display_df.empty:
         st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
