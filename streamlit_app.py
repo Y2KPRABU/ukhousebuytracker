@@ -284,11 +284,14 @@ if section_data:
     st.write("---")
     cols = st.columns([1, 1])
     with cols[0]:
+        if 'selected_section_dropdown' not in st.session_state:
+            st.session_state.selected_section_dropdown = st.session_state.selected_section
+
         selected_section = st.selectbox(
             "Select section (or 'All' for everything)",
             options=['All'] + section_names,
             index=0 if selected_section not in section_names else section_names.index(selected_section) + 1,
-            key='selected_section'
+            key='selected_section_dropdown'
         )
 
         # Keep session state in sync so pie and table use the same value
