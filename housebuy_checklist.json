@@ -6,7 +6,17 @@
     "Agree offer and acceptance terms",
     "Estate agent confirmation of agreed sale price",
     "Register with conveyancer/solicitor",
-    "Instruct solicitor"
+    "Instruct solicitor",
+    "Check if seller has extensions",
+    "Check for window/door/roof/utility replacements",
+    "If yes, request planning permissions and regulation certificates",
+    "Ask for FENSA certificates for glass doors/windows",
+    "Ask for boiler Gas Safety installation certificate",
+    "Ask for rewiring EIC/EICR certificates",
+    "Collect boiler service records",
+    "Check for asbestos in old chimney",
+    "Check for loft extensions",
+    "Check for garage conversions/demolitions/conservatory extensions"
   ],
   "Survey & Reports": [
     "Arrange basic valuation survey",

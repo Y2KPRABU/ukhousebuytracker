@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 
 st.set_page_config(page_title="UK House Buying Checklist", page_icon="🏠")
@@ -51,7 +52,8 @@ def build_df_from_json(checklist_data):
                 "Done": False,
                 "Pending With": "",
                 "Date Completed": "",
-                "Notes": ""
+                "Notes": "",
+                "Tested certificate available": False
             })
     return pd.DataFrame(rows)
 
@@ -113,7 +115,7 @@ def load_sheet_to_df(spreadsheet_id, sheet_name, client):
     if not records:
         return pd.DataFrame()
     df = pd.DataFrame(records)
-    expected = ["Section", "Item", "Done", "Pending With", "Date Completed", "Notes"]
+    expected = ["Section", "Item", "Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     missing = [col for col in expected if col not in df.columns]
     if missing:
         st.warning(f"Google Sheet missing columns: {missing}. Using JSON default schema.")
@@ -200,7 +202,8 @@ edited_df = st.data_editor(
         "Done": st.column_config.CheckboxColumn("Done"),
         "Pending With": st.column_config.TextColumn("Pending With"),
         "Date Completed": st.column_config.TextColumn("Date Completed"),
-        "Notes": st.column_config.TextColumn("Notes")
+        "Notes": st.column_config.TextColumn("Notes"),
+        "Tested certificate available": st.column_config.CheckboxColumn("Tested certificate available")
     }
 )
 
@@ -208,20 +211,47 @@ edited_df = st.data_editor(
 processed_df = enforce_ta_forms_order(edited_df.copy())
 st.session_state.checklist_df = processed_df
 
+# Group by section and create accordions with pie charts
+sections = processed_df.groupby("Section")
+
+for section_name, section_df in sections:
+    total = len(section_df)
+    completed = section_df["Done"].sum()
+    in_progress = ((~section_df["Done"]) & (section_df["Pending With"].str.strip() != "")).sum()
+    not_started = total - completed - in_progress
+    percent = (completed / total * 100) if total > 0 else 0
+
+    # Pie chart
+    fig = go.Figure(data=[go.Pie(
+        labels=['Completed', 'In Progress', 'Not Started'],
+        values=[completed, in_progress, not_started],
+        marker_colors=['green', 'yellow', 'white'],
+        textinfo='label+percent',
+        insidetextorientation='radial'
+    )])
+    fig.update_layout(
+        title=f"{section_name}: {completed}/{total} ({percent:.1f}%)",
+        showlegend=False,
+        height=300
+    )
+
+    with st.expander(f"{section_name}: {completed}/{total} ({percent:.1f}%)", expanded=False):
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # List items with colors
+        st.subheader("Tasks")
+        for _, row in section_df.iterrows():
+            item = row["Item"]
+            done = row["Done"]
+            pending = row["Pending With"].strip()
+            if done:
+                color = "green"
+            elif pending:
+                color = "yellow"
+            else:
+                color = "white"
+            st.markdown(f"<span style='color:{color}; background-color:black; padding:2px 4px;'>{item}</span>", unsafe_allow_html=True)
+
 done_count = int(processed_df["Done"].sum()) if "Done" in processed_df else 0
-st.info(f"Progress: {done_count} of {len(processed_df)} tasks done ({(done_count/len(processed_df)*100 if len(processed_df)>0 else 0):.1f}%).")
-
-if st.button("Add blank row"):
-    new_row = {"Section": "", "Item": "", "Done": False, "Pending With": "", "Date Completed": "", "Notes": ""}
-    st.session_state.checklist_df = pd.concat([st.session_state.checklist_df, pd.DataFrame([new_row])], ignore_index=True)
-    st.experimental_rerun()
-
-st.write("### Quick actions")
-if st.button("Mark all done"):
-    st.session_state.checklist_df["Done"] = True
-    st.experimental_rerun()
-
-if st.button("Clear completed dates for unchecked items"):
-    st.session_state.checklist_df.loc[~st.session_state.checklist_df["Done"], "Date Completed"] = ""
-    st.experimental_rerun()
+st.info(f"Overall Progress: {done_count} of {len(processed_df)} tasks done ({(done_count/len(processed_df)*100 if len(processed_df)>0 else 0):.1f}%).")
 
