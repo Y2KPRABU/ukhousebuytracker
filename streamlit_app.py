@@ -6,6 +6,12 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+try:
+    from streamlit_plotly_events import plotly_events
+except ImportError:
+    plotly_events = None
+
+
 st.set_page_config(page_title="UK House Buying Checklist", page_icon="🏠")
 
 st.title("🏠 UK House Buying Checklist")
@@ -190,25 +196,10 @@ st.sidebar.info("Tip: Ensure your buildings insurance is active from the moment 
 st.sidebar.write("### Data source")
 st.sidebar.write(f"Loaded from `{DATA_FILE}`")
 
-# Main interactive editor
-st.subheader("Checklist table")
-edited_df = st.data_editor(
-    st.session_state.checklist_df,
-    use_container_width=True,
-    num_rows="dynamic",
-    column_config={
-        "Section": st.column_config.TextColumn("Section", disabled=True),
-        "Item": st.column_config.TextColumn("Item", disabled=True),
-        "Done": st.column_config.CheckboxColumn("Done"),
-        "Pending With": st.column_config.TextColumn("Pending With"),
-        "Date Completed": st.column_config.TextColumn("Date Completed"),
-        "Notes": st.column_config.TextColumn("Notes"),
-        "Tested certificate available": st.column_config.CheckboxColumn("Tested certificate available")
-    }
-)
+# Main interactive editor hidden as per request
 
 # Automatically promote TA6/TA10 once Instruct solicitor is done
-processed_df = enforce_ta_forms_order(edited_df.copy())
+processed_df = enforce_ta_forms_order(st.session_state.checklist_df.copy())
 st.session_state.checklist_df = processed_df
 
 # Overall pie chart for sections
@@ -241,14 +232,75 @@ if section_data:
         marker=dict(colors=[d['color'] for d in section_data])
     )])
     fig.update_layout(
-        title="Sections Overview (size = total tasks, color = section)",
         showlegend=False,
         height=400
     )
-    st.plotly_chart(fig, use_container_width=True)
 
-# Controls hidden as per request
+    if plotly_events:
+        # Capture click events from pie chart
+        clicked = plotly_events(fig, click_event=True, key='pie_click')
+        st.plotly_chart(fig, use_container_width=True)
+        selected_from_pie = clicked[0]['label'] if clicked else None
+    else:
+        st.plotly_chart(fig, use_container_width=True)
+        selected_from_pie = None
 
-done_count = int(processed_df["Done"].sum()) if "Done" in processed_df else 0
-st.info(f"Overall Progress: {done_count} of {len(processed_df)} tasks done ({(done_count/len(processed_df)*100 if len(processed_df)>0 else 0):.1f}%).")
+    # Keep selection in session state
+    if 'selected_section' not in st.session_state:
+        st.session_state.selected_section = None
+    if selected_from_pie:
+        st.session_state.selected_section = selected_from_pie
+
+    st.write("---")
+    cols = st.columns([1, 1])
+    section_names = [d['name'] for d in section_data]
+    if st.session_state.selected_section in section_names:
+        default_index = section_names.index(st.session_state.selected_section) + 1
+    else:
+        default_index = 0
+
+    with cols[0]:
+        selected_section = st.selectbox(
+            "Select section (or 'All' for everything)",
+            options=['All'] + section_names,
+            index=default_index
+        )
+    with cols[1]:
+        show_all = st.checkbox("Show all data", value=False)
+
+    # Determine table scope
+    if show_all:
+        display_df = processed_df
+    else:
+        if selected_section == 'All':
+            display_df = pd.DataFrame()
+        else:
+            display_df = processed_df[processed_df['Section'] == selected_section]
+
+    if not display_df.empty:
+        st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
+        edited_df = st.data_editor(
+            display_df,
+            use_container_width=True,
+            num_rows='dynamic',
+            column_config={
+                'Section': st.column_config.TextColumn('Section', disabled=True),
+                'Item': st.column_config.TextColumn('Item', disabled=True),
+                'Done': st.column_config.CheckboxColumn('Done'),
+                'Pending With': st.column_config.TextColumn('Pending With'),
+                'Date Completed': st.column_config.TextColumn('Date Completed'),
+                'Notes': st.column_config.TextColumn('Notes'),
+                'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
+            }
+        )
+        if show_all:
+            st.session_state.checklist_df = edited_df
+            processed_df = edited_df
+        else:
+            mask = st.session_state.checklist_df['Section'] == selected_section
+            st.session_state.checklist_df.loc[mask, edited_df.columns] = edited_df.values
+            processed_df = st.session_state.checklist_df
+
+# no explicit progress info displayed now
+
 
