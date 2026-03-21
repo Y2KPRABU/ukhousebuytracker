@@ -229,8 +229,10 @@ if section_data:
     section_names = [d['name'] for d in section_data]
 
     # Ensure a default selected section exists
-    if 'selected_section' not in st.session_state or st.session_state.selected_section not in section_names:
-        st.session_state.selected_section = section_names[0] if section_names else None
+    if 'selected_section' not in st.session_state:
+        st.session_state.selected_section = section_names[0] if section_names else 'All'
+    elif st.session_state.selected_section not in section_names and st.session_state.selected_section != 'All':
+        st.session_state.selected_section = section_names[0] if section_names else 'All'
 
     selected_section = st.session_state.selected_section
 
