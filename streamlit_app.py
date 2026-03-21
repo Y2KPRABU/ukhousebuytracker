@@ -263,23 +263,22 @@ if section_data:
         clicked = plotly_events(fig, click_event=True, key='pie_click')
         if clicked and isinstance(clicked, list) and len(clicked) > 0:
             first_event = clicked[0]
-            if isinstance(first_event, dict):
-                selected_from_pie = first_event.get('label') or first_event.get('x') or first_event.get('y')
-                # If label is not directly present but pointNumber exists then map by index
-                if selected_from_pie is None and 'pointNumber' in first_event:
-                    idx = int(first_event['pointNumber'])
+            if isinstance(first_event, dict) and 'points' in first_event and first_event['points']:
+                point = first_event['points'][0]
+                selected_from_pie = point.get('label') or point.get('x') or point.get('y')
+                if selected_from_pie is None and 'pointNumber' in point:
+                    idx = int(point['pointNumber'])
                     if 0 <= idx < len(section_names):
                         selected_from_pie = section_names[idx]
-        # If no click event yet, use selected section from state
         if selected_from_pie is None:
             selected_from_pie = selected_section
     else:
         st.plotly_chart(fig, use_container_width=True)
         selected_from_pie = selected_section
 
-    # ensure the session value follows pie clicks (and is a valid section)
     if selected_from_pie in section_names:
         selected_section = selected_from_pie
+
     st.session_state.selected_section = selected_section
 
     st.write("---")
