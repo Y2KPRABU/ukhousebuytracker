@@ -1,0 +1,49 @@
+{
+  "Initial Stage": [
+    "Memorandum of Sale (from Agent)",
+    "ID & AML Checks (Passport/Address)",
+    "Client Care Pack (Signed)",
+    "Agree offer and acceptance terms",
+    "Estate agent confirmation of agreed sale price",
+    "Register with conveyancer/solicitor",
+    "Instruct solicitor"
+  ],
+  "Survey & Reports": [
+    "Arrange basic valuation survey",
+    "Arrange RICS HomeBuyer report",
+    "Arrange full building survey",
+    "Review survey report (recommendations & costs)",
+    "Raise repairs/search queries with seller",
+    "Confirm FENSA compliance for glazing/doors"
+  ],
+  "Legal & Searches": [
+    "TA6 Property Information Form",
+    "TA10 Fittings and Contents Form",
+    "Local Authority Searches",
+    "Environmental Searches",
+    "Water and Drainage Search",
+    "Chancel Repair Liability Search",
+    "Report on Title (Read & Signed)",
+    "Review replies to pre-contract enquiries",
+    "Mortgage offer received and checked",
+    "Gazumping/gazundering risk managed"
+  ],
+  "Offers & Negotiation": [
+    "Price negotiation completed",
+    "Negotiated fixtures/fittings included",
+    "Confirm deposit amount and date",
+    "Agreement to completion date",
+    "Solicitor/master plan for exchange agreed"
+  ],
+  "Exchange & Completion": [
+    "Buildings Insurance active from exchange date",
+    "Transfer Deed (TR1) signed",
+    "Mortgage deed signed",
+    "Exchange contract and deposit paid",
+    "Completion statement received",
+    "Final search/priority searches done",
+    "Completion funds received by seller",
+    "Keys collected",
+    "Post-completion formalities (stamp duty, Land Registry)"
+  ]
+}
