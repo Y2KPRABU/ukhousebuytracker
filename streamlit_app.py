@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from colorsys import rgb_to_hls, hls_to_rgb
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -62,6 +63,32 @@ def build_df_from_json(checklist_data):
                 "Tested certificate available": False
             })
     return pd.DataFrame(rows)
+
+
+def brighten_hex_color(hex_color, lightness_boost=0.16, saturation_boost=0.08):
+    """Return a slightly brighter version of a hex color for selected-state emphasis."""
+    clean = hex_color.lstrip('#')
+    red = int(clean[0:2], 16) / 255
+    green = int(clean[2:4], 16) / 255
+    blue = int(clean[4:6], 16) / 255
+    hue, lightness, saturation = rgb_to_hls(red, green, blue)
+    boosted_lightness = min(0.92, lightness + lightness_boost)
+    boosted_saturation = min(1.0, saturation + saturation_boost)
+    new_red, new_green, new_blue = hls_to_rgb(hue, boosted_lightness, boosted_saturation)
+    return '#{:02X}{:02X}{:02X}'.format(
+        int(new_red * 255),
+        int(new_green * 255),
+        int(new_blue * 255),
+    )
+
+
+def hex_to_rgba(hex_color, alpha):
+    """Convert a hex color to rgba() for translucent Plotly fills."""
+    clean = hex_color.lstrip('#')
+    red = int(clean[0:2], 16)
+    green = int(clean[2:4], 16)
+    blue = int(clean[4:6], 16)
+    return f'rgba({red}, {green}, {blue}, {alpha})'
 
 
 def enforce_ta_forms_order(df):
@@ -234,26 +261,61 @@ if section_data:
     elif st.session_state.selected_section not in section_names and st.session_state.selected_section != 'All':
         st.session_state.selected_section = section_names[0] if section_names else 'All'
 
+    dropdown_selection = st.session_state.get('selected_section_dropdown')
+    if dropdown_selection in section_names or dropdown_selection == 'All':
+        st.session_state.selected_section = dropdown_selection
+
     selected_section = st.session_state.selected_section
 
-    # pulled slice to stand out
-    pulls = [0.1 if s == selected_section else 0 for s in section_names]
+    # Use slate borders for all slices and make the selected one more prominent.
+    pulls = [0.16 if s == selected_section else 0.02 for s in section_names]
+    border_colors = ['#334155' if s == selected_section else '#475569' for s in section_names]
+    slice_colors = [
+        brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
+        for d in section_data
+    ]
 
-    fig = go.Figure(data=[go.Pie(
+    shadow_fill_colors = [
+        hex_to_rgba('#1E293B', 0.18) if s == selected_section else 'rgba(0, 0, 0, 0)'
+        for s in section_names
+    ]
+    shadow_border_colors = [
+        '#0F172A' if s == selected_section else 'rgba(0, 0, 0, 0)'
+        for s in section_names
+    ]
+    shadow_pulls = [0.19 if s == selected_section else 0 for s in section_names]
+
+    fig = go.Figure()
+    fig.add_trace(go.Pie(
         labels=section_names,
         values=[d['total'] for d in section_data],
         textinfo='label+percent',
         textfont=dict(size=16, color='black', family='Arial', weight='bold'),
         insidetextorientation='radial',
         marker=dict(
-            colors=[d['color'] for d in section_data],
-            line=dict(color='white', width=3)
+            colors=slice_colors,
+            line=dict(color=border_colors, width=5)
         ),
         pull=pulls,
         hole=0.0,
         sort=False,
         direction='clockwise'
-    )])
+    ))
+    fig.add_trace(go.Pie(
+        labels=section_names,
+        values=[d['total'] for d in section_data],
+        textinfo='none',
+        hoverinfo='skip',
+        marker=dict(
+            colors=shadow_fill_colors,
+            line=dict(color=shadow_border_colors, width=8)
+        ),
+        pull=shadow_pulls,
+        hole=0.0,
+        sort=False,
+        direction='clockwise',
+        showlegend=False
+    ))
     fig.update_layout(
         showlegend=False,
         height=420,
@@ -272,6 +334,10 @@ if section_data:
                     idx = int(point['pointNumber'])
                     if 0 <= idx < len(section_names):
                         selected_from_pie = section_names[idx]
+                if selected_from_pie in section_names and selected_from_pie != selected_section:
+                    st.session_state.selected_section = selected_from_pie
+                    st.session_state.selected_section_dropdown = selected_from_pie
+                    st.experimental_rerun()
         if selected_from_pie is None:
             selected_from_pie = selected_section
     else:
@@ -298,6 +364,7 @@ if section_data:
 
         # Keep session state in sync so pie and table use the same value
         st.session_state.selected_section = selected_section
+        st.session_state.selected_section_dropdown = selected_section
 
     with cols[1]:
         show_all = st.checkbox("Show all data", value=st.session_state.get('show_all', False))
