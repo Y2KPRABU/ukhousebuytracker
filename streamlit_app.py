@@ -211,46 +211,67 @@ edited_df = st.data_editor(
 processed_df = enforce_ta_forms_order(edited_df.copy())
 st.session_state.checklist_df = processed_df
 
-# Group by section and create accordions with pie charts
+# Overall pie chart for sections
 sections = processed_df.groupby("Section")
+section_data = []
+section_colors = ['#E6F3FF', '#E6FFE6', '#FFFFE6', '#FFE6F3', '#F3E6FF']  # light blue, green, yellow, pink, purple
+color_map = {}
+for i, (section_name, _) in enumerate(sections):
+    color_map[section_name] = section_colors[i % len(section_colors)]
 
 for section_name, section_df in sections:
     total = len(section_df)
     completed = section_df["Done"].sum()
-    in_progress = ((~section_df["Done"]) & (section_df["Pending With"].str.strip() != "")).sum()
-    not_started = total - completed - in_progress
     percent = (completed / total * 100) if total > 0 else 0
+    section_data.append({
+        'name': section_name,
+        'total': total,
+        'completed': completed,
+        'percent': percent,
+        'color': color_map[section_name]
+    })
 
-    # Pie chart
+if section_data:
     fig = go.Figure(data=[go.Pie(
-        labels=['Completed', 'In Progress', 'Not Started'],
-        values=[completed, in_progress, not_started],
-        marker_colors=['green', 'yellow', 'white'],
-        textinfo='label+percent',
-        insidetextorientation='radial'
+        labels=[d['name'] for d in section_data],
+        values=[d['total'] for d in section_data],
+        textinfo='label+value',
+        insidetextorientation='radial',
+        marker=dict(colors=[d['color'] for d in section_data])
     )])
     fig.update_layout(
-        title=f"{section_name}: {completed}/{total} ({percent:.1f}%)",
+        title="Sections Overview (size = total tasks, color = section)",
         showlegend=False,
-        height=300
+        height=400
     )
+    st.plotly_chart(fig, use_container_width=True)
 
-    with st.expander(f"{section_name}: {completed}/{total} ({percent:.1f}%)", expanded=False):
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # List items with colors
-        st.subheader("Tasks")
-        for _, row in section_df.iterrows():
-            item = row["Item"]
-            done = row["Done"]
-            pending = row["Pending With"].strip()
-            if done:
-                color = "green"
-            elif pending:
-                color = "yellow"
-            else:
-                color = "white"
-            st.markdown(f"<span style='color:{color}; background-color:black; padding:2px 4px;'>{item}</span>", unsafe_allow_html=True)
+# Section selector
+section_options = [d['name'] for d in section_data] + ["All"]
+selected_section = st.selectbox("Select section to view/edit tasks", options=section_options, index=len(section_options)-1)  # default to "All"
+
+# Display and edit tasks for selected section
+if selected_section != "All":
+    section_df = processed_df[processed_df["Section"] == selected_section].copy()
+    st.subheader(f"Edit Tasks in {selected_section}")
+    edited_section_df = st.data_editor(
+        section_df,
+        use_container_width=True,
+        num_rows="dynamic",
+        column_config={
+            "Section": st.column_config.TextColumn("Section", disabled=True),
+            "Item": st.column_config.TextColumn("Item", disabled=True),
+            "Done": st.column_config.CheckboxColumn("Done"),
+            "Pending With": st.column_config.TextColumn("Pending With"),
+            "Date Completed": st.column_config.TextColumn("Date Completed"),
+            "Notes": st.column_config.TextColumn("Notes"),
+            "Tested certificate available": st.column_config.CheckboxColumn("Tested certificate available")
+        }
+    )
+    # Update the full df
+    mask = st.session_state.checklist_df["Section"] == selected_section
+    st.session_state.checklist_df.loc[mask, edited_section_df.columns] = edited_section_df.values
+    processed_df = st.session_state.checklist_df  # update for pie
 
 done_count = int(processed_df["Done"].sum()) if "Done" in processed_df else 0
 st.info(f"Overall Progress: {done_count} of {len(processed_df)} tasks done ({(done_count/len(processed_df)*100 if len(processed_df)>0 else 0):.1f}%).")
