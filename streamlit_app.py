@@ -212,24 +212,25 @@ processed_df = enforce_ta_forms_order(edited_df.copy())
 st.session_state.checklist_df = processed_df
 
 # Overall pie chart for sections
-sections = processed_df.groupby("Section")
 section_data = []
-section_colors = ['#E6F3FF', '#E6FFE6', '#FFFFE6', '#FFE6F3', '#F3E6FF']  # light blue, green, yellow, pink, purple
+section_colors = ['#E6F3FF', '#E6FFE6', '#FFFFE6', '#FFE6F3', '#F3E6FF', '#FFF3E6']  # light blue, green, yellow, pink, purple, orange
 color_map = {}
-for i, (section_name, _) in enumerate(sections):
+for i, section_name in enumerate(data.keys()):
     color_map[section_name] = section_colors[i % len(section_colors)]
 
-for section_name, section_df in sections:
-    total = len(section_df)
-    completed = section_df["Done"].sum()
-    percent = (completed / total * 100) if total > 0 else 0
-    section_data.append({
-        'name': section_name,
-        'total': total,
-        'completed': completed,
-        'percent': percent,
-        'color': color_map[section_name]
-    })
+for section_name in data.keys():
+    section_df = processed_df[processed_df["Section"] == section_name]
+    if not section_df.empty:
+        total = len(section_df)
+        completed = section_df["Done"].sum()
+        percent = (completed / total * 100) if total > 0 else 0
+        section_data.append({
+            'name': section_name,
+            'total': total,
+            'completed': completed,
+            'percent': percent,
+            'color': color_map[section_name]
+        })
 
 if section_data:
     fig = go.Figure(data=[go.Pie(
@@ -247,53 +248,10 @@ if section_data:
     st.plotly_chart(fig, use_container_width=True)
 
 # Controls
-col1, col2 = st.columns(2)
-with col1:
-    show_all = st.checkbox("Show all tasks in table", value=False)
-with col2:
-    section_options = [d['name'] for d in section_data]
-    selected_section = st.selectbox("Select section to view/edit tasks", options=section_options, index=None)
+section_options = [d['name'] for d in section_data]
+selected_section = st.selectbox("Select section to view/edit tasks", options=section_options, index=None)
 
-# Display and edit tasks
-if show_all:
-    st.subheader("All Tasks")
-    edited_df = st.data_editor(
-        processed_df,
-        use_container_width=True,
-        num_rows="dynamic",
-        column_config={
-            "Section": st.column_config.TextColumn("Section", disabled=True),
-            "Item": st.column_config.TextColumn("Item", disabled=True),
-            "Done": st.column_config.CheckboxColumn("Done"),
-            "Pending With": st.column_config.TextColumn("Pending With"),
-            "Date Completed": st.column_config.TextColumn("Date Completed"),
-            "Notes": st.column_config.TextColumn("Notes"),
-            "Tested certificate available": st.column_config.CheckboxColumn("Tested certificate available")
-        }
-    )
-    st.session_state.checklist_df = edited_df
-    processed_df = edited_df
-elif selected_section:
-    section_df = processed_df[processed_df["Section"] == selected_section].copy()
-    st.subheader(f"Edit Tasks in {selected_section}")
-    edited_section_df = st.data_editor(
-        section_df,
-        use_container_width=True,
-        num_rows="dynamic",
-        column_config={
-            "Section": st.column_config.TextColumn("Section", disabled=True),
-            "Item": st.column_config.TextColumn("Item", disabled=True),
-            "Done": st.column_config.CheckboxColumn("Done"),
-            "Pending With": st.column_config.TextColumn("Pending With"),
-            "Date Completed": st.column_config.TextColumn("Date Completed"),
-            "Notes": st.column_config.TextColumn("Notes"),
-            "Tested certificate available": st.column_config.CheckboxColumn("Tested certificate available")
-        }
-    )
-    # Update the full df
-    mask = st.session_state.checklist_df["Section"] == selected_section
-    st.session_state.checklist_df.loc[mask, edited_section_df.columns] = edited_section_df.values
-    processed_df = st.session_state.checklist_df
+# Table hidden as per request
 
 done_count = int(processed_df["Done"].sum()) if "Done" in processed_df else 0
 st.info(f"Overall Progress: {done_count} of {len(processed_df)} tasks done ({(done_count/len(processed_df)*100 if len(processed_df)>0 else 0):.1f}%).")

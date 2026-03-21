@@ -6,7 +6,9 @@
     "Agree offer and acceptance terms",
     "Estate agent confirmation of agreed sale price",
     "Register with conveyancer/solicitor",
-    "Instruct solicitor",
+    "Instruct solicitor"
+  ],
+  "Buyer PreChecks": [
     "Check if seller has extensions",
     "Check for window/door/roof/utility replacements",
     "If yes, request planning permissions and regulation certificates",
