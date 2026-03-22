@@ -352,14 +352,10 @@ if section_data:
     selected_section = st.session_state.selected_section
 
     # Use slate borders for all slices and make the selected one more prominent.
-    pulls = [0.16 if s == selected_section else 0.02 for s in section_names]
+    pulls = [0.14 if s == selected_section else 0.02 for s in section_names]
     border_colors = ['#334155' if s == selected_section else '#475569' for s in section_names]
     slice_colors = [
         brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
-        for d in section_data
-    ]
-    pie_labels = [
-        f"{d['name']}<br>{int(d['completed'])} of {int(d['total'])} done"
         for d in section_data
     ]
     pie_custom_data = [
@@ -367,14 +363,15 @@ if section_data:
         for d in section_data
     ]
 
+    selected_meta = next((d for d in section_data if d['name'] == selected_section), section_data[0])
+
     fig = go.Figure()
     fig.add_trace(go.Pie(
         labels=section_names,
         values=[d['total'] for d in section_data],
-        text=pie_labels,
-        textinfo='text',
-        textfont=dict(size=16, color='black', family='Arial', weight='bold'),
-        insidetextorientation='radial',
+        textinfo='label+percent',
+        textposition='outside',
+        textfont=dict(size=14, color='black', family='Arial', weight='bold'),
         customdata=pie_custom_data,
         hovertemplate=(
             "%{label}<br>"
@@ -386,40 +383,64 @@ if section_data:
             line=dict(color=border_colors, width=5)
         ),
         pull=pulls,
-        hole=0.0,
+        hole=0.42,
         sort=False,
         direction='clockwise'
     ))
     fig.update_layout(
         showlegend=False,
-        height=420,
-        margin=dict(t=30, b=10, l=10, r=10)
+        height=500,
+        margin=dict(t=20, b=20, l=30, r=30),
+        annotations=[
+            dict(
+                text=(
+                    f"<b>{selected_meta['name']}</b><br>"
+                    f"{int(selected_meta['completed'])} of {int(selected_meta['total'])} done<br>"
+                    f"{selected_meta['percent']:.0f}% complete"
+                ),
+                x=0.5,
+                y=0.5,
+                showarrow=False,
+                font=dict(size=14, color='#0F172A')
+            )
+        ]
     )
 
     selected_from_pie = selected_section
-    if plotly_events:
-        clicked = plotly_events(fig, click_event=True, key='pie_click')
-        if clicked and isinstance(clicked, list) and len(clicked) > 0:
-            first_event = clicked[0]
-            point = first_event
-            if isinstance(first_event, dict) and 'points' in first_event and first_event['points']:
-                point = first_event['points'][0]
+    chart_cols = st.columns([1.6, 1])
+    with chart_cols[0]:
+        if plotly_events:
+            clicked = plotly_events(fig, click_event=True, key='pie_click')
+            if clicked and isinstance(clicked, list) and len(clicked) > 0:
+                first_event = clicked[0]
+                point = first_event
+                if isinstance(first_event, dict) and 'points' in first_event and first_event['points']:
+                    point = first_event['points'][0]
 
-            if isinstance(point, dict):
-                candidate = point.get('label') or point.get('x') or point.get('y')
-                if candidate in section_names:
-                    selected_from_pie = candidate
-                else:
-                    point_index = point.get('pointNumber', point.get('pointIndex'))
-                    if isinstance(point_index, int) and 0 <= point_index < len(section_names):
-                        selected_from_pie = section_names[point_index]
+                if isinstance(point, dict):
+                    candidate = point.get('label') or point.get('x') or point.get('y')
+                    if candidate in section_names:
+                        selected_from_pie = candidate
+                    else:
+                        point_index = point.get('pointNumber', point.get('pointIndex'))
+                        if isinstance(point_index, int) and 0 <= point_index < len(section_names):
+                            selected_from_pie = section_names[point_index]
 
-        if selected_from_pie in section_names and selected_from_pie != selected_section:
-            st.session_state.selected_section = selected_from_pie
-            st.session_state.selected_section_dropdown = selected_from_pie
-            st.rerun()
-    else:
-        st.plotly_chart(fig, width='stretch')
+            if selected_from_pie in section_names and selected_from_pie != selected_section:
+                st.session_state.selected_section = selected_from_pie
+                st.session_state.selected_section_dropdown = selected_from_pie
+                st.rerun()
+        else:
+            st.plotly_chart(fig, width='stretch')
+
+    with chart_cols[1]:
+        st.markdown("### Section Progress")
+        for section in section_data:
+            progress_line = f"{int(section['completed'])}/{int(section['total'])} done ({section['percent']:.0f}%)"
+            if section['name'] == selected_section:
+                st.markdown(f"**{section['name']}**  \\\n{progress_line}")
+            else:
+                st.markdown(f"{section['name']}  \\\n{progress_line}")
 
     if selected_from_pie in section_names:
         selected_section = selected_from_pie
