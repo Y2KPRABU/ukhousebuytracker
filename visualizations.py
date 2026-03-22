@@ -63,37 +63,33 @@ def build_pie_figure(section_data, selected_section):
     """
     section_names = [d['name'] for d in section_data]
     
-    # Prepare data items with colors
-    items = []
-    for idx, d in enumerate(section_data):
-        # Use brightened color for selected, normal color for others
-        color = brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
-        
-        item = {
-            "name": f"{d['name']}\n({int(d['completed'])}/{int(d['total'])})",
-            "value": d['total'],
-            "itemStyle": {
-                "color": color,
-                "borderColor": darken_hex_color(d['color'], lightness_reduction=0.35),
-                "borderWidth": 3,
-                "shadowBlur": 10,
-                "shadowColor": "rgba(0, 0, 0, 0.3)"
-            }
-        }
-        items.append(item)
+    # Prepare data as tuples (name, value)
+    data_pairs = [
+        (f"{d['name']}\n({int(d['completed'])}/{int(d['total'])})", d['total'])
+        for d in section_data
+    ]
     
-    # Build basic pie chart
+    # Prepare colors list for each slice
+    colors = [
+        brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
+        for d in section_data
+    ]
+    
+    # Build pie chart
     pie = Pie()
     pie.add(
         "",
-        items,
+        data_pairs,
         radius=["35%", "75%"],  # Donut hole
     )
     
-    # Configure with labels and tooltip
+    # Apply colors to the pie series
+    pie.set_colors(colors)
+    
+    # Configure layout with tooltip and legend
     pie.set_global_opts(
         tooltip_opts=opts.TooltipOpts(
-            formatter="{b}: completed items"
+            formatter="{b}: items"
         ),
         legend_opts=opts.LegendOpts(
             type_="scroll",
