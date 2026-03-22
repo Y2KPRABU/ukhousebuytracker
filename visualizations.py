@@ -53,7 +53,7 @@ def build_pie_figure(section_data, selected_section):
 
     options = {
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} items"},
-        "legend": {"type": "scroll", "orient": "vertical", "right": "1%", "top": "middle"},
+        "legend": {"type": "scroll", "orient": "vertical", "right": "-100px", "top": "middle"},
         "graphic": [{
             "type": "text",
             "left": "center",
@@ -70,17 +70,25 @@ def build_pie_figure(section_data, selected_section):
             "type": "pie",
             "radius": ["40%", "70%"],
             "center": ["48%", "50%"],
-            "avoidLabelOverlap": False,
+            "avoidLabelOverlap": True,
             "label": {
                 "show": True,
-                "position": "inside",
+                "position": "outside",
                 "formatter": "{b}",
                 "fontSize": 16,
                 "fontWeight": "bold",
-                "color": "#fff",
-                "textShadowColor": "rgba(0,0,0,0.8)",
-                "textShadowBlur": 4,
-                "textShadowOffsetY": 1
+                "color": "#0F172A",
+                "textShadowColor": "rgba(255,255,255,0.8)",
+                "textShadowBlur": 8,
+                "textShadowOffsetY": 1,
+                "overflow": "break",
+                "width": 120,
+                "margin": 5
+            },
+            "labelLine": {
+                "show": True,
+                "length": 8,
+                "length2": 5
             },
             "emphasis": {
                 "label": {"show": True, "fontSize": 14, "fontWeight": "bold"},
