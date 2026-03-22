@@ -68,8 +68,8 @@ def build_pie_figure(section_data, selected_section):
         "series": [{
             "name": "Progress",
             "type": "pie",
-            "radius": ["30%", "70%"],
-            "center": ["20%", "50%"],
+            "radius": ["30%", "60%"],
+            "center": ["50%", "50%"],
             "avoidLabelOverlap": False,
             "label": {
                 "show": True,
