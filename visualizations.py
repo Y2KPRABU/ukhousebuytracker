@@ -118,12 +118,16 @@ def render_pie_with_progress(fig, section_data, selected_section, section_names)
     """
     # Display pie chart with click detection
     if plotly_events:
+        st.write("DEBUG: plotly_events is available")
         clicked = plotly_events(fig, click_event=True)
+        st.write(f"DEBUG: clicked = {clicked}")
         
         # Process clicks if any occurred
         if clicked:
+            st.write(f"DEBUG: Processing click, type={type(clicked)}, len={len(clicked) if isinstance(clicked, list) else 'N/A'}")
             if isinstance(clicked, list) and len(clicked) > 0:
                 event = clicked[0]
+                st.write(f"DEBUG: event = {event}")
                 
                 # Extract point data from the event
                 point_data = event if isinstance(event, dict) else None
@@ -133,14 +137,14 @@ def render_pie_with_progress(fig, section_data, selected_section, section_names)
                 # Try to get the section label from the point
                 if isinstance(point_data, dict):
                     label = point_data.get('label')
+                    st.write(f"DEBUG: label = {label}, section_names = {section_names}")
                     if label and label in section_names:
                         if label != selected_section:
                             st.session_state.selected_section = label
                             st.session_state.selected_section_dropdown = label
                             st.rerun()
     else:
-        # Fallback if streamlit-plotly-events not available
-        st.plotly_chart(fig, use_container_width=True)
+        st.write("DEBUG: plotly_events is NOT available, using fallback")
     
     # Display progress below chart
     st.markdown("### Section Progress")
