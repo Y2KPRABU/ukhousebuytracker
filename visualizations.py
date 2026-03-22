@@ -125,7 +125,6 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
             if raw in section_names and raw != selected_section:
                 st.session_state.selected_section = raw
                 st.session_state.selected_section_dropdown = raw
-                st.rerun(scope="fragment")
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
