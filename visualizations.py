@@ -53,7 +53,7 @@ def build_pie_figure(section_data, selected_section):
 
     options = {
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} items"},
-        "legend": {"type": "scroll", "orient": "vertical", "right": "-100px", "top": "middle"},
+        "legend": {"type": "scroll", "orient": "vertical", "right": "10px", "top": "middle"},
         "graphic": [{
             "type": "text",
             "left": "center",
@@ -82,7 +82,7 @@ def build_pie_figure(section_data, selected_section):
                 "textShadowBlur": 8,
                 "textShadowOffsetY": 1,
                 "overflow": "break",
-                "width": 120,
+                "width": 150,
                 "margin": 5
             },
             "labelLine": {
