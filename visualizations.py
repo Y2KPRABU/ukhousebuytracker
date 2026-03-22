@@ -82,8 +82,8 @@ def build_pie_figure(section_data, selected_section):
                 "textShadowBlur": 8,
                 "textShadowOffsetY": 1,
                 "overflow": "wrapping",
-                "width": 240,
-                "height": 50,
+                "width": 70,
+                "height": 150,
                 "margin": 2
             },
             "labelLine": {
