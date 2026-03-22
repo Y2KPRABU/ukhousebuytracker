@@ -118,7 +118,8 @@ def render_pie_with_progress(fig, section_data, selected_section, section_names)
     """
     # Display pie chart with click detection
     if plotly_events:
-        st.write("DEBUG: plotly_events is available")
+        st.write("DEBUG: Using plotly_events")
+        st.plotly_chart(fig, use_container_width=True)
         clicked = plotly_events(fig, click_event=True)
         st.write(f"DEBUG: clicked = {clicked}")
         
@@ -144,7 +145,8 @@ def render_pie_with_progress(fig, section_data, selected_section, section_names)
                             st.session_state.selected_section_dropdown = label
                             st.rerun()
     else:
-        st.write("DEBUG: plotly_events is NOT available, using fallback")
+        st.write("DEBUG: plotly_events not available, using fallback")
+        st.plotly_chart(fig, use_container_width=True)
     
     # Display progress below chart
     st.markdown("### Section Progress")
