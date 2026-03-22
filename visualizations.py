@@ -70,18 +70,16 @@ def build_pie_figure(section_data, selected_section):
             "type": "pie",
             "radius": ["40%", "70%"],
             "center": ["48%", "50%"],
-            "avoidLabelOverlap": True,
+            "avoidLabelOverlap": False,
             "label": {
                 "show": True,
-                "position": "outside",
+                "position": "inside",
                 "formatter": "{b}",
                 "fontSize": 16,
                 "fontWeight": "bold",
-                "overflow": "break",
-                "width": 120,
-                "color": "#0F172A",
-                "textShadowColor": "rgba(255,255,255,0.8)",
-                "textShadowBlur": 8,
+                "color": "#fff",
+                "textShadowColor": "rgba(0,0,0,0.8)",
+                "textShadowBlur": 4,
                 "textShadowOffsetY": 1
             },
             "emphasis": {
