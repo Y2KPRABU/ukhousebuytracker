@@ -285,6 +285,9 @@ st.sidebar.write(f"Loaded from `{DATA_FILE}`")
 # Main interactive editor hidden as per request
 
 # Calculate section statistics
+processed_df = enforce_ta_forms_order(st.session_state.checklist_df.copy())
+st.session_state.checklist_df = processed_df
+
 section_data = []
 section_colors = ['#E6F3FF', '#E6FFE6', '#FFFFE6', '#FFE6F3', '#F3E6FF', '#FFF3E6']  # light blue, green, yellow, pink, purple, orange
 color_map = {}
