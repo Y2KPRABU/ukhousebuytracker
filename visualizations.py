@@ -53,7 +53,7 @@ def build_pie_figure(section_data, selected_section):
 
     options = {
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} items"},
-        "legend": {"type": "scroll", "orient": "vertical", "right": "0", "top": "middle"},
+        "legend": {"type": "scroll", "orient": "vertical", "left": "62%", "top": "middle"},
         "graphic": [{
             "type": "text",
             "left": "center",
@@ -95,7 +95,18 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
     """
     selected_meta = next((d for d in section_data if d['name'] == selected_section), section_data[0])
 
-    st_echarts(options=fig_options, height="600px")
+    # Click event: extract section name (strip the "(x/y)" suffix)
+    click_events = {"click": "function(params) { return params.name; }"}
+
+    clicked = st_echarts(options=fig_options, events=click_events, height="600px")
+
+    # Handle slice click — strip progress suffix to get raw section name
+    if clicked:
+        raw = clicked.split(" (")[0]
+        if raw in section_names and raw != selected_section:
+            st.session_state.selected_section = raw
+            st.session_state.selected_section_dropdown = raw
+            st.rerun()
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -108,43 +119,3 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
             <p style="margin:0; color:#666;">{selected_meta['percent']:.0f}% complete</p>
         </div>
         """, unsafe_allow_html=True)
-
-
-
-def render_pie_with_progress(fig_options, section_data, selected_section, section_names):
-    """
-    Render 3D pie chart with section progress.
-    
-    Args:
-        fig_options: PyEcharts options dict
-        section_data: List of section dicts
-        selected_section: Currently selected section name
-        section_names: List of all section names
-    """
-    selected_meta = next((d for d in section_data if d['name'] == selected_section), section_data[0])
-    
-    # Render 3D chart with streamlit-echarts
-    st_echarts(
-        options=fig_options,
-        height="700px"
-    )
-    
-    # Display center info below chart
-    st.markdown("---")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.write("")
-    with col2:
-        st.markdown(f"""
-        <div style="text-align: center; padding: 20px; background-color: #f0f8ff; border-radius: 10px;">
-            <h3 style="margin: 0; color: #0F172A;">{selected_meta['name']}</h3>
-            <p style="margin: 10px 0; font-size: 18px; color: #333;">
-                <strong>{int(selected_meta['completed'])} of {int(selected_meta['total'])} done</strong>
-            </p>
-            <p style="margin: 0; color: #666;">
-                {selected_meta['percent']:.0f}% complete
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    with col3:
-        st.write("")
