@@ -7,11 +7,6 @@ import streamlit as st
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
 from visualizations import build_pie_figure, render_pie_with_progress
 
-try:
-    from streamlit_plotly_events import plotly_events
-except ImportError:
-    plotly_events = None
-
 
 def bootstrap_env_from_streamlit_secrets():
     """Map Streamlit secrets to environment variables for cloud storage setup."""

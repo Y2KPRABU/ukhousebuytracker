@@ -2,6 +2,6 @@ streamlit
 pandas
 gspread
 google-auth
-plotly
-streamlit-plotly-events
+pyecharts
+streamlit-echarts
 requests
