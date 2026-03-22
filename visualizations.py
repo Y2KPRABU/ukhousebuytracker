@@ -113,7 +113,12 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
     # Click event: extract section name (strip the "(x/y)" suffix)
     click_events = {"click": "function(params) { return params.name; }"}
 
-    clicked = st_echarts(options=fig_options, events=click_events, height="600px")
+    clicked = st_echarts(
+        options=fig_options,
+        events=click_events,
+        height="600px",
+        key="section-progress-donut",
+    )
 
     # Handle slice click — value is BidiComponentResult with 'chart_event' key
     if clicked:
@@ -127,5 +132,4 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
             if raw in section_names and raw != selected_section:
                 st.session_state.selected_section = raw
                 st.session_state.selected_section_dropdown = raw
-    # Progress card
-    st.markdown(f"### {selected_meta['name']} Progress")
+                st.rerun(scope="fragment")
