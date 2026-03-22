@@ -56,7 +56,7 @@ def build_pie_figure(section_data, selected_section):
         "legend": {"type": "scroll", "orient": "vertical", "right": "100px", "bottom": "10px"},
         "graphic": [{
             "type": "text",
-            "left": "48%",
+            "left": "30%",
             "top": "middle",
             "style": {
                 "text": f"{selected_meta['name']}\n{int(selected_meta['completed'])} of {int(selected_meta['total'])} done",
@@ -75,7 +75,7 @@ def build_pie_figure(section_data, selected_section):
                 "show": True,
                 "position": "outside",
                 "formatter": "{b}",
-                "fontSize": 16,
+                "fontSize": 14,
                 "fontWeight": "bold",
                 "color": "#0F172A",
                 "textShadowColor": "rgba(255,255,255,0.8)",
@@ -83,6 +83,7 @@ def build_pie_figure(section_data, selected_section):
                 "textShadowOffsetY": 1,
                 "overflow": "break",
                 "width": 240,
+                "height": 50,
                 "margin": 0
             },
             "labelLine": {
