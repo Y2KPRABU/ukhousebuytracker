@@ -51,29 +51,41 @@ def darken_hex_color(hex_color, lightness_reduction=0.25):
 
 def build_pie_figure(section_data, selected_section):
     """
-    Build a donut chart figure showing section progress.
+    Build a donut chart figure showing section progress with 3D visual effects.
+    Includes gradient-like effects, drop shadows, and depth styling.
     
     Args:
         section_data: List of dicts with keys: name, color, total, completed, percent
         selected_section: Name of the currently selected section
     
     Returns:
-        plotly.graph_objects.Figure configured as a donut chart with center annotation
+        plotly.graph_objects.Figure configured as a donut chart with visual depth effects
     """
     section_names = [d['name'] for d in section_data]
     
-    # Highlight selected section with pull and brighten effect
-    pulls = [0.14 if s == selected_section else 0.02 for s in section_names]
-    slice_colors = [
-        brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
-        for d in section_data
-    ]
+    # Create opacity variations for depth effect (selected is fully opaque, others slightly transparent)
+    opacities = [1.0 if s == selected_section else 0.85 for s in section_names]
     
-    # Border colors are darker versions of the slice colors
-    border_colors = [
-        darken_hex_color(d['color'], lightness_reduction=0.3)
-        for d in section_data
-    ]
+    # Highlight selected section with pull and brighten effect
+    pulls = [0.15 if s == selected_section else 0.02 for s in section_names]
+    
+    # Slice colors with opacity for depth
+    slice_colors = []
+    for d in section_data:
+        base_color = brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
+        # Apply opacity through rgba
+        hex_color = base_color.lstrip('#')
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        opacity = 1.0 if d['name'] == selected_section else 0.85
+        slice_colors.append(f"rgba({r}, {g}, {b}, {opacity})")
+    
+    # Border colors are darker versions with stronger opacity for depth
+    border_colors = []
+    for d in section_data:
+        dark_color = darken_hex_color(d['color'], lightness_reduction=0.3)
+        hex_color = dark_color.lstrip('#')
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        border_colors.append(f"rgba({r}, {g}, {b}, 0.9)")
     
     # Custom data for hover template and labels
     pie_custom_data = [
@@ -91,6 +103,24 @@ def build_pie_figure(section_data, selected_section):
     selected_meta = next((d for d in section_data if d['name'] == selected_section), section_data[0])
     
     fig = go.Figure()
+    
+    # Add shadow trace (duplicate with dark color and offset) for depth effect
+    fig.add_trace(go.Pie(
+        labels=labels_with_progress,
+        values=[d['total'] for d in section_data],
+        textinfo='none',
+        customdata=pie_custom_data,
+        marker=dict(
+            colors=['rgba(50, 50, 50, 0.15)' for _ in section_data],
+            line=dict(color='rgba(0, 0, 0, 0.1)', width=2)
+        ),
+        hole=0.42,
+        sort=False,
+        direction='clockwise',
+        hoverinfo='none'
+    ))
+    
+    # Add main pie trace
     fig.add_trace(go.Pie(
         labels=labels_with_progress,
         values=[d['total'] for d in section_data],
@@ -103,7 +133,7 @@ def build_pie_figure(section_data, selected_section):
         ),
         marker=dict(
             colors=slice_colors,
-            line=dict(color=border_colors, width=5)
+            line=dict(color=border_colors, width=6)
         ),
         pull=pulls,
         hole=0.42,
@@ -115,6 +145,8 @@ def build_pie_figure(section_data, selected_section):
         showlegend=False,
         height=700,
         margin=dict(t=40, b=40, l=80, r=80),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(250,250,252,0.5)',
         annotations=[
             dict(
                 text=(
@@ -124,7 +156,7 @@ def build_pie_figure(section_data, selected_section):
                 x=0.5,
                 y=0.5,
                 showarrow=False,
-                font=dict(size=14, color='#0F172A')
+                font=dict(size=14, color='#0F172A', family='Arial')
             )
         ]
     )
