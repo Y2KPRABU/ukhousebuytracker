@@ -63,29 +63,24 @@ def build_pie_figure(section_data, selected_section):
     """
     section_names = [d['name'] for d in section_data]
     
-    # Create opacity variations for depth effect (selected is fully opaque, others slightly transparent)
-    opacities = [1.0 if s == selected_section else 0.85 for s in section_names]
-    
-    # Highlight selected section with pull and brighten effect
-    pulls = [0.15 if s == selected_section else 0.02 for s in section_names]
-    
     # Slice colors with opacity for depth
     slice_colors = []
     for d in section_data:
         base_color = brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
-        # Apply opacity through rgba
         hex_color = base_color.lstrip('#')
         r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
         opacity = 1.0 if d['name'] == selected_section else 0.85
         slice_colors.append(f"rgba({r}, {g}, {b}, {opacity})")
     
-    # Border colors are darker versions with stronger opacity for depth
+    # Create layered border effect: dark color + slate/grey accent
     border_colors = []
     for d in section_data:
-        dark_color = darken_hex_color(d['color'], lightness_reduction=0.3)
-        hex_color = dark_color.lstrip('#')
-        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
-        border_colors.append(f"rgba({r}, {g}, {b}, 0.9)")
+        # Darken the base color
+        dark_color = darken_hex_color(d['color'], lightness_reduction=0.35)
+        border_colors.append(dark_color)
+    
+    # Slate/grey accent colors for enhanced contrast
+    slate_accents = ['#64748b', '#475569', '#334155', '#1e293b', '#0f172a', '#020617']
     
     # Custom data for hover template and labels
     pie_custom_data = [
@@ -104,7 +99,7 @@ def build_pie_figure(section_data, selected_section):
     
     fig = go.Figure()
     
-    # Add shadow trace (duplicate with dark color and offset) for depth effect
+    # Add shadow trace for depth effect
     fig.add_trace(go.Pie(
         labels=labels_with_progress,
         values=[d['total'] for d in section_data],
@@ -112,15 +107,15 @@ def build_pie_figure(section_data, selected_section):
         customdata=pie_custom_data,
         marker=dict(
             colors=['rgba(50, 50, 50, 0.15)' for _ in section_data],
-            line=dict(color='rgba(0, 0, 0, 0.1)', width=2)
+            line=dict(color=['rgba(30, 41, 59, 0.2)' for _ in section_data], width=2)
         ),
         hole=0.42,
         sort=False,
         direction='clockwise',
-        hoverinfo='none'
+        hoverinfo='skip'
     ))
     
-    # Add main pie trace
+    # Add main pie trace with enhanced borders
     fig.add_trace(go.Pie(
         labels=labels_with_progress,
         values=[d['total'] for d in section_data],
@@ -128,14 +123,15 @@ def build_pie_figure(section_data, selected_section):
         textposition='outside',
         textfont=dict(size=12, color='black', family='Arial', weight='bold'),
         customdata=pie_custom_data,
-        hovertemplate=(
-            "%{customdata[0]} of %{customdata[1]} done<extra></extra>"
-        ),
+        hovertemplate="%{customdata[0]} of %{customdata[1]} done<extra></extra>",
         marker=dict(
             colors=slice_colors,
-            line=dict(color=border_colors, width=6)
+            line=dict(
+                color=border_colors,
+                width=8
+            )
         ),
-        pull=pulls,
+        pull=[0.15 if s == selected_section else 0.02 for s in section_names],
         hole=0.42,
         sort=False,
         direction='clockwise'
