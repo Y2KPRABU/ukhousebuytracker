@@ -161,5 +161,3 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
         """, unsafe_allow_html=True)
     with col3:
         st.write("")
-    else:
-        st.plotly_chart(fig, use_container_width=True)
