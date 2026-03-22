@@ -89,8 +89,7 @@ def build_pie_figure(section_data, selected_section):
             "labelLine": {
                 "show": True,
                 "length": 3,
-                "length2": 1,
-                "lineStyle": {"color": "#0F172A", "width": 1
+                "length2": 10,
             },
             "emphasis": {
                 "label": {"show": True, "fontSize": 14, "fontWeight": "bold"},
