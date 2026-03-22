@@ -53,14 +53,14 @@ def build_pie_figure(section_data, selected_section):
 
     options = {
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} items"},
-        "legend": {"type": "scroll", "orient": "vertical", "right": "10px", "bottom": "10px"},
+        "legend": {"type": "scroll", "orient": "vertical", "right": "100px", "bottom": "10px"},
         "graphic": [{
             "type": "text",
             "left": "48%",
             "top": "middle",
             "style": {
                 "text": f"{selected_meta['name']}\n{int(selected_meta['completed'])} of {int(selected_meta['total'])} done",
-                "textAlign": "center",
+                "textAlign": "left",
                 "font": "bold 14px Arial",
                 "fill": "#0F172A"
             }
