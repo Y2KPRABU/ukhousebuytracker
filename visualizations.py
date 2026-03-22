@@ -82,7 +82,7 @@ def build_pie_figure(section_data, selected_section):
                 "textShadowBlur": 8,
                 "textShadowOffsetY": 1,
                 "overflow": "break",
-                "width": 70,
+                "width": 90,
                 "height": 150,
                 "margin": 2
             },
