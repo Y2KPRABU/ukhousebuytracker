@@ -75,8 +75,14 @@ def build_pie_figure(section_data, selected_section):
                 "show": True,
                 "position": "outside",
                 "formatter": "{b}",
-                "fontSize": 12,
-                "fontWeight": "bold"
+                "fontSize": 16,
+                "fontWeight": "bold",
+                "overflow": "break",
+                "width": 120,
+                "color": "#0F172A",
+                "textShadowColor": "rgba(255,255,255,0.8)",
+                "textShadowBlur": 8,
+                "textShadowOffsetY": 1
             },
             "emphasis": {
                 "label": {"show": True, "fontSize": 14, "fontWeight": "bold"},

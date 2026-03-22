@@ -360,6 +360,7 @@ if section_data:
         if not display_df.empty:
             st.caption(f"Current account: {st.session_state.get('cloud_user_input', st.session_state.active_user_id) or 'not set'}")
             st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
+            save_clicked = st.button("Save data", key="save_data_btn")
             with st.form("checklist_edit_form", clear_on_submit=False):
                 edited_df = st.data_editor(
                     display_df,
@@ -375,7 +376,6 @@ if section_data:
                         'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
                     }
                 )
-                save_clicked = st.form_submit_button("Save data")
 
             if save_clicked:
                 if show_all:
