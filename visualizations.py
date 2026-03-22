@@ -56,7 +56,7 @@ def build_pie_figure(section_data, selected_section):
         "legend": {"type": "scroll", "orient": "vertical", "right": "10px", "bottom": "10px"},
         "graphic": [{
             "type": "text",
-            "left": "center",
+            "left": "48%",
             "top": "middle",
             "style": {
                 "text": f"{selected_meta['name']}\n{int(selected_meta['completed'])} of {int(selected_meta['total'])} done",
@@ -70,7 +70,7 @@ def build_pie_figure(section_data, selected_section):
             "type": "pie",
             "radius": ["40%", "70%"],
             "center": ["48%", "50%"],
-            "avoidLabelOverlap": True,
+            "avoidLabelOverlap": False,
             "label": {
                 "show": True,
                 "position": "outside",
