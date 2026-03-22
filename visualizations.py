@@ -30,6 +30,25 @@ def brighten_hex_color(hex_color, lightness_boost=0.16, saturation_boost=0.08):
     return f"#{int(r*255):02x}{int(g*255):02x}{int(b*255):02x}"
 
 
+def darken_hex_color(hex_color, lightness_reduction=0.25):
+    """
+    Darken a hex color by reducing lightness.
+    
+    Args:
+        hex_color: Color in #RRGGBB format
+        lightness_reduction: Amount to reduce lightness (0-1)
+    
+    Returns:
+        Darkened color in #RRGGBB format
+    """
+    hex_color = hex_color.lstrip('#')
+    r, g, b = tuple(int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4))
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    l = max(0, l - lightness_reduction)
+    r, g, b = colorsys.hls_to_rgb(h, l, s)
+    return f"#{int(r*255):02x}{int(g*255):02x}{int(b*255):02x}"
+
+
 def build_pie_figure(section_data, selected_section):
     """
     Build a donut chart figure showing section progress.
@@ -45,15 +64,20 @@ def build_pie_figure(section_data, selected_section):
     
     # Highlight selected section with pull and brighten effect
     pulls = [0.14 if s == selected_section else 0.02 for s in section_names]
-    border_colors = ['#334155' if s == selected_section else '#475569' for s in section_names]
     slice_colors = [
         brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
         for d in section_data
     ]
     
+    # Border colors are darker versions of the slice colors
+    border_colors = [
+        darken_hex_color(d['color'], lightness_reduction=0.3)
+        for d in section_data
+    ]
+    
     # Custom data for hover template and labels
     pie_custom_data = [
-        [int(d['completed']), int(d['total']), float(d['percent'])]
+        [int(d['completed']), int(d['total'])]
         for d in section_data
     ]
     
@@ -75,8 +99,7 @@ def build_pie_figure(section_data, selected_section):
         textfont=dict(size=12, color='black', family='Arial', weight='bold'),
         customdata=pie_custom_data,
         hovertemplate=(
-            "%{label}<br>"
-            "%{customdata[2]:.0f}% complete<extra></extra>"
+            "%{customdata[0]} of %{customdata[1]} done<extra></extra>"
         ),
         marker=dict(
             colors=slice_colors,
@@ -96,8 +119,7 @@ def build_pie_figure(section_data, selected_section):
             dict(
                 text=(
                     f"<b>{selected_meta['name']}</b><br>"
-                    f"{int(selected_meta['completed'])} of {int(selected_meta['total'])} done<br>"
-                    f"{selected_meta['percent']:.0f}% complete"
+                    f"{int(selected_meta['completed'])} of {int(selected_meta['total'])} done"
                 ),
                 x=0.5,
                 y=0.5,
