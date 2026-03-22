@@ -81,15 +81,16 @@ def build_pie_figure(section_data, selected_section):
                 "textShadowColor": "rgba(255,255,255,0.8)",
                 "textShadowBlur": 8,
                 "textShadowOffsetY": 1,
-                "overflow": "break",
+                "overflow": "wrapping",
                 "width": 240,
                 "height": 50,
-                "margin": 0
+                "margin": 2
             },
             "labelLine": {
                 "show": True,
                 "length": 3,
-                "length2": 1
+                "length2": 10,
+                "lineStyle": {"color": "#0F172A", "width": 1
             },
             "emphasis": {
                 "label": {"show": True, "fontSize": 14, "fontWeight": "bold"},
