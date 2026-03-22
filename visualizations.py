@@ -53,7 +53,7 @@ def build_pie_figure(section_data, selected_section):
 
     options = {
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} items"},
-        "legend": {"type": "scroll", "orient": "vertical", "left": "62%", "top": "middle"},
+        "legend": {"type": "scroll", "orient": "vertical", "right": "1%", "top": "middle"},
         "graphic": [{
             "type": "text",
             "left": "center",
@@ -69,7 +69,7 @@ def build_pie_figure(section_data, selected_section):
             "name": "Progress",
             "type": "pie",
             "radius": ["40%", "70%"],
-            "center": ["40%", "50%"],
+            "center": ["35%", "50%"],
             "avoidLabelOverlap": True,
             "label": {
                 "show": True,

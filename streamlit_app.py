@@ -336,9 +336,12 @@ if section_data:
     st.write("---")
     cols = st.columns([1, 1])
     with cols[0]:
+        dropdown_options = ['All'] + section_names
+        dropdown_index = dropdown_options.index(st.session_state.selected_section) if st.session_state.selected_section in dropdown_options else 0
         selected_section = st.selectbox(
             "Select section (or 'All' for everything)",
-            options=['All'] + section_names,
+            options=dropdown_options,
+            index=dropdown_index,
             key='selected_section_dropdown'
         )
 
