@@ -40,6 +40,7 @@ def build_pie_figure(section_data, selected_section):
         data_items.append({
             "name": f"{d['name']} ({int(d['completed'])}/{int(d['total'])})",
             "value": d['total'],
+            "selected": d['name'] == selected_section,
             "itemStyle": {
                 "color": color,
                 "borderColor": darken_hex_color(d['color'], lightness_reduction=0.35),
@@ -68,6 +69,8 @@ def build_pie_figure(section_data, selected_section):
         "series": [{
             "name": "Progress",
             "type": "pie",
+            "selectedMode": "single",
+            "selectedOffset": 12,
             "radius": ["30%", "60%"],
             "center": ["50%", "50%"],
             "avoidLabelOverlap": False,
@@ -95,7 +98,6 @@ def build_pie_figure(section_data, selected_section):
                 "label": {"show": True, "fontSize": 14, "fontWeight": "bold"},
                 "itemStyle": {"shadowBlur": 20, "shadowColor": "rgba(0,0,0,0.5)"}
             },
-            "labelLine": {"show": True},
             "data": data_items
         }]
     }
@@ -125,15 +127,5 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
             if raw in section_names and raw != selected_section:
                 st.session_state.selected_section = raw
                 st.session_state.selected_section_dropdown = raw
-
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown(f"""
-        <div style="text-align:center; padding:16px; background:#f0f8ff; border-radius:10px; margin-top:-10px">
-            <h3 style="margin:0; color:#0F172A;">{selected_meta['name']}</h3>
-            <p style="margin:8px 0; font-size:18px; color:#333;">
-                <strong>{int(selected_meta['completed'])} of {int(selected_meta['total'])} done</strong>
-            </p>
-            <p style="margin:0; color:#666;">{selected_meta['percent']:.0f}% complete</p>
-        </div>
-        """, unsafe_allow_html=True)
+    # Progress card
+    st.markdown(f"### {selected_meta['name']} Progress")
