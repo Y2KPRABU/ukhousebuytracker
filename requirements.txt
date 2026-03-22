@@ -4,3 +4,4 @@ gspread
 google-auth
 plotly
 streamlit-plotly-events
+requests

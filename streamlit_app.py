@@ -6,10 +6,35 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from cloud_storage import build_store_from_env, load_for_user, save_for_user
+
 try:
     from streamlit_plotly_events import plotly_events
 except ImportError:
     plotly_events = None
+
+
+def bootstrap_env_from_streamlit_secrets():
+    """Map Streamlit secrets to environment variables for cloud storage setup."""
+    try:
+        secrets_map = dict(st.secrets)
+    except Exception:
+        # Local runs may not have a secrets file yet; skip bootstrap quietly.
+        return
+
+    keys = [
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_ANON_KEY",
+        "SUPABASE_CHECKLIST_TABLE",
+        "USER_ID",
+    ]
+    for key in keys:
+        if not os.getenv(key) and key in secrets_map:
+            os.environ[key] = str(secrets_map[key])
+
+
+bootstrap_env_from_streamlit_secrets()
 
 
 st.set_page_config(page_title="UK House Buying Checklist", page_icon="🏠")
@@ -81,6 +106,12 @@ def brighten_hex_color(hex_color, lightness_boost=0.16, saturation_boost=0.08):
     )
 
 
+def dataframe_signature(df):
+    """Create a stable signature so autosave runs only when table content changes."""
+    as_text = df.fillna("").astype(str)
+    return str(pd.util.hash_pandas_object(as_text, index=True).sum())
+
+
 def enforce_ta_forms_order(df):
     """If solicitor has been instructed, ensure TA6/TA10 are in Legal & Searches and prioritized."""
     if "Item" not in df.columns or "Done" not in df.columns:
@@ -102,8 +133,23 @@ def enforce_ta_forms_order(df):
     return df
 
 
+cloud_store = build_store_from_env()
+default_checklist_df = build_df_from_json(data)
+
 if "checklist_df" not in st.session_state:
-    st.session_state.checklist_df = build_df_from_json(data)
+    st.session_state.checklist_df = default_checklist_df
+
+if "active_user_id" not in st.session_state:
+    st.session_state.active_user_id = os.getenv("USER_ID", "").strip()
+
+if "autosave_cloud" not in st.session_state:
+    st.session_state.autosave_cloud = False
+
+if "last_saved_signature" not in st.session_state:
+    st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
+
+if "cloud_status" not in st.session_state:
+    st.session_state.cloud_status = ""
 
 # Google Sheets helpers
 try:
@@ -156,10 +202,53 @@ def write_df_to_sheet(df, spreadsheet_id, sheet_name, client):
     worksheet.update(values)
 
 
+# Sidebar config for account cloud persistence
+st.sidebar.header("Account & Cloud Save")
+cloud_user_input = st.sidebar.text_input(
+    "Account ID (email or username)",
+    value=st.session_state.active_user_id,
+    key="cloud_user_input",
+)
+st.session_state.autosave_cloud = st.sidebar.checkbox(
+    "Autosave account checklist (can be slow)",
+    value=st.session_state.autosave_cloud,
+)
+
+if st.sidebar.button("Load account data"):
+    loaded_df, source = load_for_user(cloud_store, cloud_user_input, default_checklist_df)
+    st.session_state.checklist_df = loaded_df
+    st.session_state.active_user_id = cloud_user_input.strip()
+    st.session_state.last_saved_signature = dataframe_signature(loaded_df)
+    st.session_state.cloud_status = f"Loaded {source} data using {cloud_store.backend_name}."
+    st.rerun()
+
+if st.sidebar.button("Save account data"):
+    ok, message = save_for_user(cloud_store, cloud_user_input, st.session_state.checklist_df)
+    if ok:
+        st.session_state.active_user_id = cloud_user_input.strip()
+        st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
+        st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
+    else:
+        st.session_state.cloud_status = f"Save failed: {message}"
+
+# One-time default load for the active account on first run.
+if "cloud_bootstrap_done" not in st.session_state:
+    if st.session_state.active_user_id:
+        loaded_df, source = load_for_user(cloud_store, st.session_state.active_user_id, default_checklist_df)
+        st.session_state.checklist_df = loaded_df
+        st.session_state.last_saved_signature = dataframe_signature(loaded_df)
+        st.session_state.cloud_status = f"Loaded {source} data using {cloud_store.backend_name}."
+    st.session_state.cloud_bootstrap_done = True
+
+if st.session_state.cloud_status:
+    st.sidebar.caption(st.session_state.cloud_status)
+
+st.sidebar.caption(f"Storage backend: {cloud_store.backend_name}")
+
 # Sidebar config for Google Sheets linking
 st.sidebar.header("Google Sheets integration")
 spreadsheet_id = st.sidebar.text_input("Spreadsheet ID", value=os.getenv("GOOGLE_SHEET_ID", ""))
-user_id = st.sidebar.text_input("User identifier (email or username)", value=os.getenv("USER_ID", ""))
+user_id = st.sidebar.text_input("User identifier (email or username)", value=st.session_state.active_user_id)
 
 if user_id.strip():
     # sanitize worksheet name
@@ -345,6 +434,22 @@ if section_data:
         display_df = processed_df[processed_df['Section'] == selected_section] if selected_section in section_names else pd.DataFrame()
 
     if not display_df.empty:
+        save_cols = st.columns([1, 2])
+        with save_cols[0]:
+            if st.button("Save account data", key="save_account_data_main"):
+                current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
+                ok, message = save_for_user(cloud_store, current_user, st.session_state.checklist_df)
+                if ok:
+                    st.session_state.active_user_id = current_user
+                    st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
+                    st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
+                    st.success("Account data saved.")
+                else:
+                    st.error(f"Save failed: {message}")
+
+        with save_cols[1]:
+            st.caption(f"Current account: {st.session_state.get('cloud_user_input', st.session_state.active_user_id) or 'not set'}")
+
         st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
         edited_df = st.data_editor(
             display_df,
@@ -367,6 +472,16 @@ if section_data:
             mask = st.session_state.checklist_df['Section'] == selected_section
             st.session_state.checklist_df.loc[mask, edited_df.columns] = edited_df.values
             processed_df = st.session_state.checklist_df
+
+current_signature = dataframe_signature(st.session_state.checklist_df)
+if st.session_state.autosave_cloud and st.session_state.active_user_id:
+    if current_signature != st.session_state.last_saved_signature:
+        ok, message = save_for_user(cloud_store, st.session_state.active_user_id, st.session_state.checklist_df)
+        if ok:
+            st.session_state.last_saved_signature = current_signature
+            st.session_state.cloud_status = f"Autosaved to {cloud_store.backend_name}."
+        else:
+            st.session_state.cloud_status = f"Autosave failed: {message}"
 
 # no explicit progress info displayed now
 
