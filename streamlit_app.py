@@ -358,14 +358,29 @@ if section_data:
         brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
         for d in section_data
     ]
+    pie_labels = [
+        f"{d['name']}<br>{int(d['completed'])} of {int(d['total'])} done"
+        for d in section_data
+    ]
+    pie_custom_data = [
+        [int(d['completed']), int(d['total']), float(d['percent'])]
+        for d in section_data
+    ]
 
     fig = go.Figure()
     fig.add_trace(go.Pie(
         labels=section_names,
         values=[d['total'] for d in section_data],
-        textinfo='label+percent',
+        text=pie_labels,
+        textinfo='text',
         textfont=dict(size=16, color='black', family='Arial', weight='bold'),
         insidetextorientation='radial',
+        customdata=pie_custom_data,
+        hovertemplate=(
+            "%{label}<br>"
+            "%{customdata[0]} of %{customdata[1]} done "
+            "(%{customdata[2]:.0f}% complete)<extra></extra>"
+        ),
         marker=dict(
             colors=slice_colors,
             line=dict(color=border_colors, width=5)
@@ -434,47 +449,50 @@ if section_data:
         display_df = processed_df[processed_df['Section'] == selected_section] if selected_section in section_names else pd.DataFrame()
 
     if not display_df.empty:
-        save_cols = st.columns([1, 2])
-        with save_cols[0]:
-            if st.button("Save account data", key="save_account_data_main"):
-                current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
+        st.caption("Note: Pie chart refreshes only when you click Save data.")
+        st.caption(f"Current account: {st.session_state.get('cloud_user_input', st.session_state.active_user_id) or 'not set'}")
+        st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
+        with st.form("checklist_edit_form", clear_on_submit=False):
+            edited_df = st.data_editor(
+                display_df,
+                width='stretch',
+                num_rows='dynamic',
+                column_config={
+                    'Section': st.column_config.TextColumn('Section', disabled=True),
+                    'Item': st.column_config.TextColumn('Item', disabled=True),
+                    'Done': st.column_config.CheckboxColumn('Done'),
+                    'Pending With': st.column_config.TextColumn('Pending With'),
+                    'Date Completed': st.column_config.TextColumn('Date Completed'),
+                    'Notes': st.column_config.TextColumn('Notes'),
+                    'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
+                }
+            )
+            save_clicked = st.form_submit_button("Save data")
+
+        if save_clicked:
+            if show_all:
+                st.session_state.checklist_df = edited_df
+            else:
+                mask = st.session_state.checklist_df['Section'] == selected_section
+                st.session_state.checklist_df.loc[mask, edited_df.columns] = edited_df.values
+
+            st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
+
+            current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
+            if current_user:
                 ok, message = save_for_user(cloud_store, current_user, st.session_state.checklist_df)
                 if ok:
                     st.session_state.active_user_id = current_user
-                    st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
                     st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
-                    st.success("Account data saved.")
                 else:
-                    st.error(f"Save failed: {message}")
+                    st.session_state.cloud_status = f"Save failed: {message}"
+            else:
+                st.session_state.cloud_status = "Saved in app session. Set Account ID to persist to storage."
 
-        with save_cols[1]:
-            st.caption(f"Current account: {st.session_state.get('cloud_user_input', st.session_state.active_user_id) or 'not set'}")
+            st.rerun()
 
-        st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
-        edited_df = st.data_editor(
-            display_df,
-            width='stretch',
-            num_rows='dynamic',
-            column_config={
-                'Section': st.column_config.TextColumn('Section', disabled=True),
-                'Item': st.column_config.TextColumn('Item', disabled=True),
-                'Done': st.column_config.CheckboxColumn('Done'),
-                'Pending With': st.column_config.TextColumn('Pending With'),
-                'Date Completed': st.column_config.TextColumn('Date Completed'),
-                'Notes': st.column_config.TextColumn('Notes'),
-                'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
-            }
-        )
-        if show_all:
-            st.session_state.checklist_df = edited_df
-            processed_df = edited_df
-        else:
-            mask = st.session_state.checklist_df['Section'] == selected_section
-            st.session_state.checklist_df.loc[mask, edited_df.columns] = edited_df.values
-            processed_df = st.session_state.checklist_df
-
-current_signature = dataframe_signature(st.session_state.checklist_df)
 if st.session_state.autosave_cloud and st.session_state.active_user_id:
+    current_signature = dataframe_signature(st.session_state.checklist_df)
     if current_signature != st.session_state.last_saved_signature:
         ok, message = save_for_user(cloud_store, st.session_state.active_user_id, st.session_state.checklist_df)
         if ok:
