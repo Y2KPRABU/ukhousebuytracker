@@ -68,7 +68,7 @@ def build_pie_figure(section_data, selected_section):
         "series": [{
             "name": "Progress",
             "type": "pie",
-            "radius": ["40%", "70%"],
+            "radius": ["30%", "70%"],
             "center": ["48%", "50%"],
             "avoidLabelOverlap": False,
             "label": {
@@ -87,7 +87,7 @@ def build_pie_figure(section_data, selected_section):
             },
             "labelLine": {
                 "show": True,
-                "length": 1,
+                "length": 3,
                 "length2": 1
             },
             "emphasis": {
