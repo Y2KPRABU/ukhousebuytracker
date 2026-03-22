@@ -51,9 +51,15 @@ def build_pie_figure(section_data, selected_section):
         for d in section_data
     ]
     
-    # Custom data for hover template
+    # Custom data for hover template and labels
     pie_custom_data = [
         [int(d['completed']), int(d['total']), float(d['percent'])]
+        for d in section_data
+    ]
+    
+    # Create multiline labels with progress info
+    labels_with_progress = [
+        f"{d['name']}<br>({int(d['completed'])}/{int(d['total'])})"
         for d in section_data
     ]
     
@@ -62,16 +68,15 @@ def build_pie_figure(section_data, selected_section):
     
     fig = go.Figure()
     fig.add_trace(go.Pie(
-        labels=section_names,
+        labels=labels_with_progress,
         values=[d['total'] for d in section_data],
         textinfo='label+percent',
         textposition='outside',
-        textfont=dict(size=14, color='black', family='Arial', weight='bold'),
+        textfont=dict(size=12, color='black', family='Arial', weight='bold'),
         customdata=pie_custom_data,
         hovertemplate=(
             "%{label}<br>"
-            "%{customdata[0]} of %{customdata[1]} done "
-            "(%{customdata[2]:.0f}% complete)<extra></extra>"
+            "%{customdata[2]:.0f}% complete<extra></extra>"
         ),
         marker=dict(
             colors=slice_colors,
@@ -85,8 +90,8 @@ def build_pie_figure(section_data, selected_section):
     
     fig.update_layout(
         showlegend=False,
-        height=500,
-        margin=dict(t=20, b=20, l=30, r=30),
+        height=700,
+        margin=dict(t=40, b=40, l=80, r=80),
         annotations=[
             dict(
                 text=(
@@ -107,8 +112,8 @@ def build_pie_figure(section_data, selected_section):
 
 def render_pie_with_progress(fig, section_data, selected_section, section_names):
     """
-    Render pie chart with click-to-select and a side progress panel.
-    Handles click events and updates session state.
+    Render pie chart with click-to-select functionality.
+    Progress info is embedded in the pie labels and center annotation.
     
     Args:
         fig: plotly Figure object
@@ -118,7 +123,7 @@ def render_pie_with_progress(fig, section_data, selected_section, section_names)
     """
     # Display pie chart with click detection
     if plotly_events:
-        clicked = plotly_events(fig, click_event=True, key="pie_click_handler", override_height=500)
+        clicked = plotly_events(fig, click_event=True, key="pie_click_handler", override_height=700)
         
         # Process clicks if any occurred
         if clicked and len(clicked) > 0:
@@ -137,14 +142,3 @@ def render_pie_with_progress(fig, section_data, selected_section, section_names)
                             st.rerun()
     else:
         st.plotly_chart(fig, use_container_width=True)
-    
-    # Display progress below chart
-    st.markdown("### Section Progress")
-    cols = st.columns(2)
-    for idx, section in enumerate(section_data):
-        progress_line = f"{int(section['completed'])}/{int(section['total'])} done ({section['percent']:.0f}%)"
-        with cols[idx % 2]:
-            if section['name'] == selected_section:
-                st.markdown(f"**{section['name']}**  \n{progress_line}")
-            else:
-                st.markdown(f"{section['name']}  \n{progress_line}")
