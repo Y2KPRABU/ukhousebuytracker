@@ -56,7 +56,7 @@ def build_pie_figure(section_data, selected_section):
         "legend": {"type": "scroll", "orient": "vertical", "right": "100px", "bottom": "10px"},
         "graphic": [{
             "type": "text",
-            "left": "30%",
+            "left": "40%",
             "top": "middle",
             "style": {
                 "text": f"{selected_meta['name']}\n{int(selected_meta['completed'])} of {int(selected_meta['total'])} done",
