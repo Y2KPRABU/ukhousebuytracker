@@ -5,7 +5,6 @@ import pandas as pd
 import streamlit as st
 
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
-from visualizations import build_pie_figure, render_pie_with_progress
 
 
 def bootstrap_env_from_streamlit_secrets():
@@ -331,10 +330,6 @@ if section_data:
 
     selected_section = st.session_state.selected_section
     
-    # Build and render pie chart with progress panel
-    fig = build_pie_figure(section_data, selected_section)
-    render_pie_with_progress(fig, section_data, selected_section, section_names)
-
     st.write("---")
     cols = st.columns([1, 1])
     with cols[0]:
