@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>UK House Buying Checklist</title>
+  <meta name="description" content="Track your home-buying milestones from offer to keys with an interactive checklist and progress view." />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+
+  <!-- Replace this with your deployed Streamlit app URL -->
+  <meta name="app:url" content="https://ukhouse.streamlit.app/" />
+  <link rel="canonical" href="https://ukhouse.streamlit.app/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="UK House Buying Checklist" />
+  <meta property="og:description" content="Track your home-buying milestones from offer to keys with an interactive checklist and progress view." />
+  <meta property="og:url" content="https://ukhouse.streamlit.app/" />
+  <meta property="og:image" content="https://ukhouse.streamlit.app/landing/preview-card.svg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="UK House Buying Checklist" />
+  <meta name="twitter:description" content="Track your home-buying milestones from offer to keys with an interactive checklist and progress view." />
+  <meta name="twitter:image" content="https://ukhouse.streamlit.app/landing/preview-card.svg" />
+
+  <meta http-equiv="refresh" content="1;url=https://ukhouse.streamlit.app/" />
+
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #475569;
+      --paper: #ffffff;
+      --bg1: #e6f3ff;
+      --bg2: #f6efe6;
+      --button: #0f172a;
+      --buttonText: #f8fafc;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(1200px 600px at 5% 10%, var(--bg1), transparent),
+                  radial-gradient(900px 500px at 95% 90%, var(--bg2), transparent),
+                  #f8fafc;
+    }
+
+    .card {
+      width: min(700px, calc(100% - 32px));
+      background: color-mix(in srgb, var(--paper) 90%, #e2e8f0);
+      border: 1px solid #dbe3ee;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      letter-spacing: 0.01em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .actions {
+      margin-top: 18px;
+    }
+
+    a.button {
+      display: inline-block;
+      text-decoration: none;
+      background: var(--button);
+      color: var(--buttonText);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Opening UK House Buying Checklist...</h1>
+    <p>If the app does not open automatically, use the button below.</p>
+    <div class="actions">
+      <a class="button" href="https://ukhouse.streamlit.app/">Open App</a>
+    </div>
+  </main>
+  <script>
+    window.location.replace("https://ukhouse.streamlit.app/");
+  </script>
+</body>
+</html>

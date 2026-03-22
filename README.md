@@ -62,3 +62,19 @@ Streamlit Cloud:
 3. Redeploy or reboot the app.
 
 The app bootstraps these secrets into environment variables at startup.
+
+### Metadata Landing Page (SEO + Social Previews)
+
+This repository now includes a static landing page at `landing/index.html` with Open Graph and Twitter card tags.
+
+Use it when sharing your app URL so link previews show title/description/image reliably, then auto-redirect users into Streamlit.
+
+Quick setup:
+
+1. Open `landing/index.html`.
+2. Replace every `https://your-streamlit-app.example.com` with your deployed Streamlit URL.
+3. Host the `landing/` folder on any static host (or serve it from your main domain).
+
+Preview image file:
+
+- `landing/preview-card.svg`

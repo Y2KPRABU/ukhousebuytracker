@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">UK House Buying Checklist</title>
+  <desc id="desc">Track your home-buying milestones from offer to keys.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e6f3ff"/>
+      <stop offset="100%" stop-color="#f6efe6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="70" y="70" width="1060" height="490" rx="24" fill="#ffffff" opacity="0.88"/>
+  <text x="120" y="220" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="700" fill="#0f172a">
+    UK House Buying Checklist
+  </text>
+  <text x="120" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="34" fill="#334155">
+    Track every milestone from offer to keys.
+  </text>
+  <text x="120" y="370" font-family="Segoe UI, Arial, sans-serif" font-size="34" fill="#334155">
+    Interactive progress donut, section drill-down, cloud save.
+  </text>
+  <circle cx="925" cy="315" r="120" fill="#e6ffe6" stroke="#9bb89b" stroke-width="8"/>
+  <circle cx="925" cy="315" r="72" fill="#ffffff"/>
+  <path d="M925 195 A120 120 0 0 1 1037 291 L980 304 A62 62 0 0 0 925 253 Z" fill="#99c3ff"/>
+  <path d="M1037 291 A120 120 0 0 1 940 432 L933 373 A62 62 0 0 0 980 304 Z" fill="#a5dda5"/>
+  <path d="M940 432 A120 120 0 0 1 827 394 L864 347 A62 62 0 0 0 933 373 Z" fill="#ffd88a"/>
+</svg>

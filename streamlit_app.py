@@ -31,7 +31,21 @@ def bootstrap_env_from_streamlit_secrets():
 bootstrap_env_from_streamlit_secrets()
 
 
-st.set_page_config(page_title="UK House Buying Checklist", page_icon="🏠")
+st.set_page_config(
+    page_title="UK House Buying Checklist",
+    page_icon="🏠",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        "Get Help": "https://docs.streamlit.io/",
+        "Report a bug": "https://github.com/streamlit/streamlit/issues",
+        "About": (
+            "UK House Buying Checklist\n"
+            "Track your home-buying journey from offer to keys, including searches,"
+            " exchange, and completion milestones."
+        ),
+    },
+)
 
 st.title("🏠 UK House Buying Checklist")
 st.write("Track your journey from offer to keys.")
