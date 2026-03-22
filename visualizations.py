@@ -83,12 +83,12 @@ def build_pie_figure(section_data, selected_section):
                 "textShadowOffsetY": 1,
                 "overflow": "break",
                 "width": 140,
-                "margin": 2
+                "margin": 0
             },
             "labelLine": {
                 "show": True,
-                "length": 3,
-                "length2": 2
+                "length": 1,
+                "length2": 1
             },
             "emphasis": {
                 "label": {"show": True, "fontSize": 14, "fontWeight": "bold"},
