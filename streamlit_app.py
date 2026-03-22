@@ -340,11 +340,6 @@ if section_data:
     fig = build_pie_figure(section_data, selected_section)
     render_pie_with_progress(fig, section_data, selected_section, section_names)
 
-    if selected_from_pie in section_names:
-        selected_section = selected_from_pie
-
-    st.session_state.selected_section = selected_section
-
     st.write("---")
     cols = st.columns([1, 1])
     with cols[0]:
