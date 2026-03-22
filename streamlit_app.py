@@ -1,6 +1,5 @@
 import json
 import os
-from datetime import datetime
 from colorsys import rgb_to_hls, hls_to_rgb
 
 import pandas as pd
@@ -80,15 +79,6 @@ def brighten_hex_color(hex_color, lightness_boost=0.16, saturation_boost=0.08):
         int(new_green * 255),
         int(new_blue * 255),
     )
-
-
-def hex_to_rgba(hex_color, alpha):
-    """Convert a hex color to rgba() for translucent Plotly fills."""
-    clean = hex_color.lstrip('#')
-    red = int(clean[0:2], 16)
-    green = int(clean[2:4], 16)
-    blue = int(clean[4:6], 16)
-    return f'rgba({red}, {green}, {blue}, {alpha})'
 
 
 def enforce_ta_forms_order(df):
@@ -204,7 +194,7 @@ if st.sidebar.button("Load from Google Sheets"):
                 st.sidebar.info("No valid data found in Google Sheet tab; using local checklist defaults.")
             else:
                 st.session_state.checklist_df = loaded_df
-                st.experimental_rerun()
+                st.rerun()
         except Exception as err:
             st.sidebar.error(f"Unable to load Google Sheet: {err}")
 
@@ -261,9 +251,14 @@ if section_data:
     elif st.session_state.selected_section not in section_names and st.session_state.selected_section != 'All':
         st.session_state.selected_section = section_names[0] if section_names else 'All'
 
-    dropdown_selection = st.session_state.get('selected_section_dropdown')
-    if dropdown_selection in section_names or dropdown_selection == 'All':
-        st.session_state.selected_section = dropdown_selection
+    # Keep dropdown state aligned before rendering the selectbox widget.
+    # This is safe because the widget is not yet instantiated in this run.
+    if (
+        'selected_section_dropdown' not in st.session_state
+        or st.session_state.selected_section_dropdown not in (['All'] + section_names)
+        or st.session_state.selected_section_dropdown != st.session_state.selected_section
+    ):
+        st.session_state.selected_section_dropdown = st.session_state.selected_section
 
     selected_section = st.session_state.selected_section
 
@@ -274,16 +269,6 @@ if section_data:
         brighten_hex_color(d['color']) if d['name'] == selected_section else d['color']
         for d in section_data
     ]
-
-    shadow_fill_colors = [
-        hex_to_rgba('#1E293B', 0.18) if s == selected_section else 'rgba(0, 0, 0, 0)'
-        for s in section_names
-    ]
-    shadow_border_colors = [
-        '#0F172A' if s == selected_section else 'rgba(0, 0, 0, 0)'
-        for s in section_names
-    ]
-    shadow_pulls = [0.19 if s == selected_section else 0 for s in section_names]
 
     fig = go.Figure()
     fig.add_trace(go.Pie(
@@ -301,48 +286,36 @@ if section_data:
         sort=False,
         direction='clockwise'
     ))
-    fig.add_trace(go.Pie(
-        labels=section_names,
-        values=[d['total'] for d in section_data],
-        textinfo='none',
-        hoverinfo='skip',
-        marker=dict(
-            colors=shadow_fill_colors,
-            line=dict(color=shadow_border_colors, width=8)
-        ),
-        pull=shadow_pulls,
-        hole=0.0,
-        sort=False,
-        direction='clockwise',
-        showlegend=False
-    ))
     fig.update_layout(
         showlegend=False,
         height=420,
         margin=dict(t=30, b=10, l=10, r=10)
     )
 
-    selected_from_pie = None
+    selected_from_pie = selected_section
     if plotly_events:
         clicked = plotly_events(fig, click_event=True, key='pie_click')
         if clicked and isinstance(clicked, list) and len(clicked) > 0:
             first_event = clicked[0]
+            point = first_event
             if isinstance(first_event, dict) and 'points' in first_event and first_event['points']:
                 point = first_event['points'][0]
-                selected_from_pie = point.get('label') or point.get('x') or point.get('y')
-                if selected_from_pie is None and 'pointNumber' in point:
-                    idx = int(point['pointNumber'])
-                    if 0 <= idx < len(section_names):
-                        selected_from_pie = section_names[idx]
-                if selected_from_pie in section_names and selected_from_pie != selected_section:
-                    st.session_state.selected_section = selected_from_pie
-                    st.session_state.selected_section_dropdown = selected_from_pie
-                    st.experimental_rerun()
-        if selected_from_pie is None:
-            selected_from_pie = selected_section
+
+            if isinstance(point, dict):
+                candidate = point.get('label') or point.get('x') or point.get('y')
+                if candidate in section_names:
+                    selected_from_pie = candidate
+                else:
+                    point_index = point.get('pointNumber', point.get('pointIndex'))
+                    if isinstance(point_index, int) and 0 <= point_index < len(section_names):
+                        selected_from_pie = section_names[point_index]
+
+        if selected_from_pie in section_names and selected_from_pie != selected_section:
+            st.session_state.selected_section = selected_from_pie
+            st.session_state.selected_section_dropdown = selected_from_pie
+            st.rerun()
     else:
-        st.plotly_chart(fig, use_container_width=True)
-        selected_from_pie = selected_section
+        st.plotly_chart(fig, width='stretch')
 
     if selected_from_pie in section_names:
         selected_section = selected_from_pie
@@ -352,19 +325,15 @@ if section_data:
     st.write("---")
     cols = st.columns([1, 1])
     with cols[0]:
-        if 'selected_section_dropdown' not in st.session_state:
-            st.session_state.selected_section_dropdown = st.session_state.selected_section
-
         selected_section = st.selectbox(
             "Select section (or 'All' for everything)",
             options=['All'] + section_names,
-            index=0 if selected_section not in section_names else section_names.index(selected_section) + 1,
             key='selected_section_dropdown'
         )
 
-        # Keep session state in sync so pie and table use the same value
+        # Keep session state in sync so pie and table use the same value.
+        # Do not write back to selected_section_dropdown after widget creation.
         st.session_state.selected_section = selected_section
-        st.session_state.selected_section_dropdown = selected_section
 
     with cols[1]:
         show_all = st.checkbox("Show all data", value=st.session_state.get('show_all', False))
@@ -379,7 +348,7 @@ if section_data:
         st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
         edited_df = st.data_editor(
             display_df,
-            use_container_width=True,
+            width='stretch',
             num_rows='dynamic',
             column_config={
                 'Section': st.column_config.TextColumn('Section', disabled=True),
