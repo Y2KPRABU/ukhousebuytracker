@@ -5,6 +5,7 @@ import pandas as pd
 import streamlit as st
 
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
+from visualizations import build_pie_figure, render_pie_with_progress
 
 
 def bootstrap_env_from_streamlit_secrets():
@@ -283,11 +284,7 @@ st.sidebar.write(f"Loaded from `{DATA_FILE}`")
 
 # Main interactive editor hidden as per request
 
-# Automatically promote TA6/TA10 once Instruct solicitor is done
-processed_df = enforce_ta_forms_order(st.session_state.checklist_df.copy())
-st.session_state.checklist_df = processed_df
-
-# Overall pie chart for sections
+# Calculate section statistics
 section_data = []
 section_colors = ['#E6F3FF', '#E6FFE6', '#FFFFE6', '#FFE6F3', '#F3E6FF', '#FFF3E6']  # light blue, green, yellow, pink, purple, orange
 color_map = {}
@@ -320,7 +317,6 @@ if section_data:
         st.session_state.selected_section = section_names[0] if section_names else 'All'
 
     # Keep dropdown state aligned before rendering the selectbox widget.
-    # This is safe because the widget is not yet instantiated in this run.
     if (
         'selected_section_dropdown' not in st.session_state
         or st.session_state.selected_section_dropdown not in (['All'] + section_names)
@@ -329,6 +325,10 @@ if section_data:
         st.session_state.selected_section_dropdown = st.session_state.selected_section
 
     selected_section = st.session_state.selected_section
+    
+    # Build and render pie chart
+    fig_options = build_pie_figure(section_data, selected_section)
+    render_pie_with_progress(fig_options, section_data, selected_section, section_names)
     
     st.write("---")
     cols = st.columns([1, 1])
@@ -339,8 +339,7 @@ if section_data:
             key='selected_section_dropdown'
         )
 
-        # Keep session state in sync so pie and table use the same value.
-        # Do not write back to selected_section_dropdown after widget creation.
+        # Keep session state in sync with dropdown widget
         st.session_state.selected_section = selected_section
 
     with cols[1]:

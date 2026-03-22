@@ -2,4 +2,6 @@ streamlit
 pandas
 gspread
 google-auth
+pyecharts
+streamlit-echarts
 requests

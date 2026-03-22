@@ -134,8 +134,7 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
     # Render 3D chart with streamlit-echarts
     st_echarts(
         options=fig_options,
-        height="700px",
-        key="pie_3d"
+        height="700px"
     )
     
     # Display center info below chart
