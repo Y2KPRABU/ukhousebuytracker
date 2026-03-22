@@ -327,78 +327,79 @@ if section_data:
     ):
         st.session_state.selected_section_dropdown = st.session_state.selected_section
 
-    selected_section = st.session_state.selected_section
-    
-    # Build and render pie chart
-    fig_options = build_pie_figure(section_data, selected_section)
-    render_pie_with_progress(fig_options, section_data, selected_section, section_names)
-    
-    st.write("---")
-    cols = st.columns([1, 1])
-    with cols[0]:
-        dropdown_options = ['All'] + section_names
-        dropdown_index = dropdown_options.index(st.session_state.selected_section) if st.session_state.selected_section in dropdown_options else 0
-        selected_section = st.selectbox(
-            "Select section (or 'All' for everything)",
-            options=dropdown_options,
-            index=dropdown_index,
-            key='selected_section_dropdown'
-        )
+    @st.fragment
+    def pie_and_table(section_data, section_names, processed_df):
+        selected_section = st.session_state.get('selected_section', section_names[0])
 
-        # Keep session state in sync with dropdown widget
-        st.session_state.selected_section = selected_section
+        # Build and render pie chart
+        fig_options = build_pie_figure(section_data, selected_section)
+        render_pie_with_progress(fig_options, section_data, selected_section, section_names)
 
-    with cols[1]:
-        show_all = st.checkbox("Show all data", value=st.session_state.get('show_all', False))
-        st.session_state.show_all = show_all
-
-    if show_all or selected_section == 'All':
-        display_df = processed_df
-    else:
-        display_df = processed_df[processed_df['Section'] == selected_section] if selected_section in section_names else pd.DataFrame()
-
-    if not display_df.empty:
-        st.caption("Note: Pie chart refreshes only when you click Save data.")
-        st.caption(f"Current account: {st.session_state.get('cloud_user_input', st.session_state.active_user_id) or 'not set'}")
-        st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
-        with st.form("checklist_edit_form", clear_on_submit=False):
-            edited_df = st.data_editor(
-                display_df,
-                width='stretch',
-                num_rows='dynamic',
-                column_config={
-                    'Section': st.column_config.TextColumn('Section', disabled=True),
-                    'Item': st.column_config.TextColumn('Item', disabled=True),
-                    'Done': st.column_config.CheckboxColumn('Done'),
-                    'Pending With': st.column_config.TextColumn('Pending With'),
-                    'Date Completed': st.column_config.TextColumn('Date Completed'),
-                    'Notes': st.column_config.TextColumn('Notes'),
-                    'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
-                }
+        st.write("---")
+        cols = st.columns([1, 1])
+        with cols[0]:
+            dropdown_options = ['All'] + section_names
+            dropdown_index = dropdown_options.index(selected_section) if selected_section in dropdown_options else 0
+            selected_section = st.selectbox(
+                "Select section (or 'All' for everything)",
+                options=dropdown_options,
+                index=dropdown_index,
+                key='selected_section_dropdown'
             )
-            save_clicked = st.form_submit_button("Save data")
+            st.session_state.selected_section = selected_section
 
-        if save_clicked:
-            if show_all:
-                st.session_state.checklist_df = edited_df
-            else:
-                mask = st.session_state.checklist_df['Section'] == selected_section
-                st.session_state.checklist_df.loc[mask, edited_df.columns] = edited_df.values
+        with cols[1]:
+            show_all = st.checkbox("Show all data", value=st.session_state.get('show_all', False))
+            st.session_state.show_all = show_all
 
-            st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
+        if show_all or selected_section == 'All':
+            display_df = processed_df
+        else:
+            display_df = processed_df[processed_df['Section'] == selected_section] if selected_section in section_names else pd.DataFrame()
 
-            current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
-            if current_user:
-                ok, message = save_for_user(cloud_store, current_user, st.session_state.checklist_df)
-                if ok:
-                    st.session_state.active_user_id = current_user
-                    st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
+        if not display_df.empty:
+            st.caption(f"Current account: {st.session_state.get('cloud_user_input', st.session_state.active_user_id) or 'not set'}")
+            st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
+            with st.form("checklist_edit_form", clear_on_submit=False):
+                edited_df = st.data_editor(
+                    display_df,
+                    width='stretch',
+                    num_rows='dynamic',
+                    column_config={
+                        'Section': st.column_config.TextColumn('Section', disabled=True),
+                        'Item': st.column_config.TextColumn('Item', disabled=True),
+                        'Done': st.column_config.CheckboxColumn('Done'),
+                        'Pending With': st.column_config.TextColumn('Pending With'),
+                        'Date Completed': st.column_config.TextColumn('Date Completed'),
+                        'Notes': st.column_config.TextColumn('Notes'),
+                        'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
+                    }
+                )
+                save_clicked = st.form_submit_button("Save data")
+
+            if save_clicked:
+                if show_all:
+                    st.session_state.checklist_df = edited_df
                 else:
-                    st.session_state.cloud_status = f"Save failed: {message}"
-            else:
-                st.session_state.cloud_status = "Saved in app session. Set Account ID to persist to storage."
+                    mask = st.session_state.checklist_df['Section'] == selected_section
+                    st.session_state.checklist_df.loc[mask, edited_df.columns] = edited_df.values
 
-            st.rerun()
+                st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
+
+                current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
+                if current_user:
+                    ok, message = save_for_user(cloud_store, current_user, st.session_state.checklist_df)
+                    if ok:
+                        st.session_state.active_user_id = current_user
+                        st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
+                    else:
+                        st.session_state.cloud_status = f"Save failed: {message}"
+                else:
+                    st.session_state.cloud_status = "Saved in app session. Set Account ID to persist to storage."
+
+                st.rerun()
+
+    pie_and_table(section_data, section_names, processed_df)
 
 if st.session_state.autosave_cloud and st.session_state.active_user_id:
     current_signature = dataframe_signature(st.session_state.checklist_df)
