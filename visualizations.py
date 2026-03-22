@@ -100,11 +100,16 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
 
     clicked = st_echarts(options=fig_options, events=click_events, height="600px")
 
+    st.write(f"DEBUG: clicked={clicked!r}, type={type(clicked).__name__}")
+    st.write(f"DEBUG: selected_section={selected_section!r}, session_state.selected_section={st.session_state.get('selected_section')!r}")
+
     # Handle slice click — strip progress suffix to get raw section name
     if clicked:
         name = clicked if isinstance(clicked, str) else (clicked.get("name") if isinstance(clicked, dict) else None)
+        st.write(f"DEBUG: name extracted={name!r}")
         if name:
             raw = name.split(" (")[0]
+            st.write(f"DEBUG: raw={raw!r}, in section_names={raw in section_names}")
             if raw in section_names and raw != selected_section:
                 st.session_state.selected_section = raw
                 st.session_state.selected_section_dropdown = raw
