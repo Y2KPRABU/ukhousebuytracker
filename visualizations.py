@@ -116,40 +116,39 @@ def render_pie_with_progress(fig, section_data, selected_section, section_names)
         selected_section: Currently selected section name
         section_names: List of all section names
     """
-    chart_cols = st.columns([1.6, 1])
-    
-    with chart_cols[0]:
-        # Render pie chart with click detection
-        if plotly_events:
-            clicked = plotly_events(fig, click_event=True, key='pie_click')
-            if clicked and isinstance(clicked, list) and len(clicked) > 0:
-                first_event = clicked[0]
-                point = first_event
-                if isinstance(first_event, dict) and 'points' in first_event and first_event['points']:
-                    point = first_event['points'][0]
+    # Display pie chart with click detection
+    if plotly_events:
+        clicked = plotly_events(fig, click_event=True)
+        
+        # Process clicks if any occurred
+        if clicked:
+            if isinstance(clicked, list) and len(clicked) > 0:
+                event = clicked[0]
                 
-                if isinstance(point, dict):
-                    candidate = point.get('label') or point.get('x') or point.get('y')
-                    selected_from_pie = candidate if candidate in section_names else selected_section
-                    
-                    if not candidate:
-                        point_index = point.get('pointNumber', point.get('pointIndex'))
-                        if isinstance(point_index, int) and 0 <= point_index < len(section_names):
-                            selected_from_pie = section_names[point_index]
-                    
-                    if selected_from_pie in section_names and selected_from_pie != selected_section:
-                        st.session_state.selected_section = selected_from_pie
-                        st.session_state.selected_section_dropdown = selected_from_pie
-                        st.rerun()
-        else:
-            st.plotly_chart(fig, use_container_width=True)
+                # Extract point data from the event
+                point_data = event if isinstance(event, dict) else None
+                if point_data and 'points' in point_data and point_data['points']:
+                    point_data = point_data['points'][0]
+                
+                # Try to get the section label from the point
+                if isinstance(point_data, dict):
+                    label = point_data.get('label')
+                    if label and label in section_names:
+                        if label != selected_section:
+                            st.session_state.selected_section = label
+                            st.session_state.selected_section_dropdown = label
+                            st.rerun()
+    else:
+        # Fallback if streamlit-plotly-events not available
+        st.plotly_chart(fig, use_container_width=True)
     
-    # Right column: Progress panel
-    with chart_cols[1]:
-        st.markdown("### Section Progress")
-        for section in section_data:
-            progress_line = f"{int(section['completed'])}/{int(section['total'])} done ({section['percent']:.0f}%)"
+    # Display progress below chart
+    st.markdown("### Section Progress")
+    cols = st.columns(2)
+    for idx, section in enumerate(section_data):
+        progress_line = f"{int(section['completed'])}/{int(section['total'])} done ({section['percent']:.0f}%)"
+        with cols[idx % 2]:
             if section['name'] == selected_section:
-                st.markdown(f"**{section['name']}**  \\\n{progress_line}")
+                st.markdown(f"**{section['name']}**  \n{progress_line}")
             else:
-                st.markdown(f"{section['name']}  \\\n{progress_line}")
+                st.markdown(f"{section['name']}  \n{progress_line}")
