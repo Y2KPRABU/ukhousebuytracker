@@ -176,28 +176,50 @@ def apply_glass_effect_styling():
     }
     
     /* Alternating row colors in data editor table */
-    [data-testid="stDataFrameResizable"] tbody tr:nth-child(odd) {
-        background-color: rgba(219, 234, 254, 0.5) !important;
+    [data-testid="stDataFrameResizable"] tbody tr:nth-child(odd),
+    [data-testid="dataframeResizable"] tbody tr:nth-child(odd),
+    div[data-testid="stDataFrameResizable"] tr:nth-child(odd),
+    tbody tr:nth-child(odd) {
+        background-color: rgba(219, 234, 254, 0.6) !important;
     }
     
-    [data-testid="stDataFrameResizable"] tbody tr:nth-child(even) {
-        background-color: rgba(240, 249, 255, 0.8) !important;
+    [data-testid="stDataFrameResizable"] tbody tr:nth-child(even),
+    [data-testid="dataframeResizable"] tbody tr:nth-child(even),
+    div[data-testid="stDataFrameResizable"] tr:nth-child(even),
+    tbody tr:nth-child(even) {
+        background-color: rgba(219, 234, 254, 0.2) !important;
     }
     
-    [data-testid="stDataFrameResizable"] tbody tr:hover {
-        background-color: rgba(147, 197, 253, 0.4) !important;
+    [data-testid="stDataFrameResizable"] tbody tr:hover,
+    tbody tr:hover {
+        background-color: rgba(147, 197, 253, 0.5) !important;
     }
     
     /* Table header styling */
-    [data-testid="stDataFrameResizable"] thead {
-        background: linear-gradient(135deg, rgba(191, 219, 254, 0.7), rgba(147, 197, 253, 0.7)) !important;
+    [data-testid="stDataFrameResizable"] thead,
+    thead {
+        background: linear-gradient(135deg, rgba(147, 197, 253, 0.6), rgba(96, 165, 250, 0.6)) !important;
     }
     
-    [data-testid="stDataFrameResizable"] thead th {
-        background: linear-gradient(135deg, rgba(191, 219, 254, 0.7), rgba(147, 197, 253, 0.7)) !important;
+    [data-testid="stDataFrameResizable"] thead th,
+    thead th {
+        background: linear-gradient(135deg, rgba(147, 197, 253, 0.6), rgba(96, 165, 250, 0.6)) !important;
         color: #0c4a6e !important;
         font-weight: 700 !important;
-        border: 1px solid rgba(147, 197, 253, 0.5) !important;
+        border: 1px solid rgba(96, 165, 250, 0.6) !important;
+    }
+    
+    /* Streamlit data editor table cells */
+    .stDataFrame tbody td {
+        background-color: inherit !important;
+    }
+    
+    .stDataFrame tbody tr:nth-child(odd) td {
+        background-color: rgba(219, 234, 254, 0.6) !important;
+    }
+    
+    .stDataFrame tbody tr:nth-child(even) td {
+        background-color: rgba(219, 234, 254, 0.2) !important;
     }
     </style>
     """
