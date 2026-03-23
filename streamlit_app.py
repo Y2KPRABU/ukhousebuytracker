@@ -5,7 +5,7 @@ import pandas as pd
 import streamlit as st
 
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
-from visualizations import build_pie_figure, render_pie_with_progress
+from visualizations import build_pie_figure, render_pie_with_progress, apply_glass_effect_styling
 from sidebar_config import render_sidebar
 
 
@@ -47,6 +47,9 @@ st.set_page_config(
         ),
     },
 )
+
+# Apply glass effect styling
+apply_glass_effect_styling()
 
 st.title("🏠 UK House Buying Checklist")
 st.write("Track your journey from offer to keys.")
