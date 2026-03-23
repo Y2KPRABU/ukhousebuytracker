@@ -6,6 +6,7 @@ import streamlit as st
 
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
 from visualizations import build_pie_figure, render_pie_with_progress
+from sidebar_config import render_sidebar
 
 
 def bootstrap_env_from_streamlit_secrets():
@@ -196,105 +197,8 @@ def write_df_to_sheet(df, spreadsheet_id, sheet_name, client):
     worksheet.update(values)
 
 
-# Sidebar config for account cloud persistence
-st.sidebar.header("Account & Cloud Save")
-cloud_user_input = st.sidebar.text_input(
-    "Account ID (email or username)",
-    value=st.session_state.active_user_id,
-    key="cloud_user_input",
-)
-st.session_state.autosave_cloud = st.sidebar.checkbox(
-    "Autosave account checklist (can be slow)",
-    value=st.session_state.autosave_cloud,
-)
-
-if st.sidebar.button("Load account data"):
-    loaded_df, source = load_for_user(cloud_store, cloud_user_input, default_checklist_df)
-    st.session_state.checklist_df = loaded_df
-    st.session_state.active_user_id = cloud_user_input.strip()
-    st.session_state.last_saved_signature = dataframe_signature(loaded_df)
-    st.session_state.cloud_status = f"Loaded {source} data using {cloud_store.backend_name}."
-    st.rerun()
-
-if st.sidebar.button("Save account data"):
-    ok, message = save_for_user(cloud_store, cloud_user_input, st.session_state.checklist_df)
-    if ok:
-        st.session_state.active_user_id = cloud_user_input.strip()
-        st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
-        st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
-    else:
-        st.session_state.cloud_status = f"Save failed: {message}"
-
-# One-time default load for the active account on first run.
-if "cloud_bootstrap_done" not in st.session_state:
-    if st.session_state.active_user_id:
-        loaded_df, source = load_for_user(cloud_store, st.session_state.active_user_id, default_checklist_df)
-        st.session_state.checklist_df = loaded_df
-        st.session_state.last_saved_signature = dataframe_signature(loaded_df)
-        st.session_state.cloud_status = f"Loaded {source} data using {cloud_store.backend_name}."
-    st.session_state.cloud_bootstrap_done = True
-
-if st.session_state.cloud_status:
-    st.sidebar.caption(st.session_state.cloud_status)
-
-st.sidebar.caption(f"Storage backend: {cloud_store.backend_name}")
-
-# Sidebar config for Google Sheets linking
-st.sidebar.header("Google Sheets integration")
-spreadsheet_id = st.sidebar.text_input("Spreadsheet ID", value=os.getenv("GOOGLE_SHEET_ID", ""))
-user_id = st.sidebar.text_input("User identifier (email or username)", value=st.session_state.active_user_id)
-
-if user_id.strip():
-    # sanitize worksheet name
-    sanitized = user_id.strip().replace("@", "_at_").replace(" ", "_").replace("/", "_").replace("\\", "_")
-    sheet_name = st.sidebar.text_input("Worksheet name", value=f"{DEFAULT_SHEET_NAME}_{sanitized}")
-else:
-    sheet_name = st.sidebar.text_input("Worksheet name", value=DEFAULT_SHEET_NAME)
-
-credentials_text = st.sidebar.text_area("Service Account JSON (paste content here)", height=180)
-credentials_file = st.sidebar.file_uploader("Or upload service_account.json", type="json")
-
-service_account_info = None
-if credentials_file is not None:
-    try:
-        service_account_info = json.load(credentials_file)
-    except Exception as err:
-        st.sidebar.error(f"Invalid uploaded JSON: {err}")
-elif credentials_text:
-    try:
-        service_account_info = json.loads(credentials_text)
-    except Exception as err:
-        st.sidebar.error(f"Invalid JSON text: {err}")
-
-if st.sidebar.button("Load from Google Sheets"):
-    if not spreadsheet_id or not sheet_name or service_account_info is None:
-        st.sidebar.warning("Provide Spreadsheet ID, worksheet name/user ID, and service account credentials first.")
-    else:
-        try:
-            client = get_gsheet_client(service_account_info)
-            loaded_df = load_sheet_to_df(spreadsheet_id, sheet_name, client)
-            if loaded_df.empty:
-                st.sidebar.info("No valid data found in Google Sheet tab; using local checklist defaults.")
-            else:
-                st.session_state.checklist_df = loaded_df
-                st.rerun()
-        except Exception as err:
-            st.sidebar.error(f"Unable to load Google Sheet: {err}")
-
-if st.sidebar.button("Save to Google Sheets"):
-    if not spreadsheet_id or not sheet_name or service_account_info is None:
-        st.sidebar.warning("Provide Spreadsheet ID, worksheet name/user ID, and service account credentials first.")
-    else:
-        try:
-            client = get_gsheet_client(service_account_info)
-            write_df_to_sheet(st.session_state.checklist_df, spreadsheet_id, sheet_name, client)
-            st.sidebar.success(f"Checklist saved to Google Sheets tab '{sheet_name}'.")
-        except Exception as err:
-            st.sidebar.error(f"Unable to save to Google Sheet: {err}")
-
-st.sidebar.info("Tip: Ensure your buildings insurance is active from the moment of **Exchange**, not Completion!")
-st.sidebar.write("### Data source")
-st.sidebar.write(f"Loaded from `{DATA_FILE}`")
+# Render sidebar with cloud and Google Sheets configuration
+render_sidebar(cloud_store, default_checklist_df, DATA_FILE, DEFAULT_SHEET_NAME)
 
 # Main interactive editor hidden as per request
 
@@ -401,6 +305,12 @@ if section_data:
                 st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
 
                 current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
+                if not current_user:
+                    st.warning(
+                        "⚠️ **No Account ID set!** Your changes have been saved locally in this session, "
+                        "but they won't be saved to persistent storage. "
+                        "Please set an Account ID in the sidebar 'Account & Cloud Save' section to save to cloud."
+                    )
                 if current_user:
                     ok, message = save_for_user(cloud_store, current_user, st.session_state.checklist_df)
                     if ok:
