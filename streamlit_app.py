@@ -198,7 +198,16 @@ def write_df_to_sheet(df, spreadsheet_id, sheet_name, client):
 
 
 # Render sidebar with cloud and Google Sheets configuration
-render_sidebar(cloud_store, default_checklist_df, DATA_FILE, DEFAULT_SHEET_NAME)
+render_sidebar(
+    cloud_store,
+    default_checklist_df,
+    DATA_FILE,
+    DEFAULT_SHEET_NAME,
+    dataframe_signature,
+    get_gsheet_client,
+    load_sheet_to_df,
+    write_df_to_sheet,
+)
 
 # Main interactive editor hidden as per request
 

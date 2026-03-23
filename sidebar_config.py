@@ -17,6 +17,10 @@ def render_sidebar(
     default_checklist_df: pd.DataFrame,
     DATA_FILE: str,
     DEFAULT_SHEET_NAME: str,
+    dataframe_signature,
+    get_gsheet_client,
+    load_sheet_to_df,
+    write_df_to_sheet,
 ):
     """
     Render the entire left sidebar with Account & Cloud Save, Google Sheets, and tips.
@@ -26,6 +30,10 @@ def render_sidebar(
         default_checklist_df: Default checklist DataFrame
         DATA_FILE: Path to the default checklist JSON file
         DEFAULT_SHEET_NAME: Name of the default Google Sheets worksheet
+        dataframe_signature: Function to compute DataFrame signature
+        get_gsheet_client: Function to get Google Sheets client
+        load_sheet_to_df: Function to load DataFrame from Google Sheet
+        write_df_to_sheet: Function to write DataFrame to Google Sheet
     """
     
     # ==================== Account & Cloud Save ====================
@@ -54,21 +62,17 @@ def render_sidebar(
     )
     
     if st.sidebar.button("Load account data"):
-        from cloud_storage import load_for_user
         loaded_df, source = load_for_user(cloud_store, cloud_user_input, default_checklist_df)
         st.session_state.checklist_df = loaded_df
         st.session_state.active_user_id = cloud_user_input.strip()
-        from streamlit_app import dataframe_signature
         st.session_state.last_saved_signature = dataframe_signature(loaded_df)
         st.session_state.cloud_status = f"Loaded {source} data using {cloud_store.backend_name}."
         st.rerun()
     
     if st.sidebar.button("Save account data"):
-        from cloud_storage import save_for_user
         ok, message = save_for_user(cloud_store, cloud_user_input, st.session_state.checklist_df)
         if ok:
             st.session_state.active_user_id = cloud_user_input.strip()
-            from streamlit_app import dataframe_signature
             st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
             st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
         else:
@@ -77,10 +81,8 @@ def render_sidebar(
     # One-time default load for the active account on first run.
     if "cloud_bootstrap_done" not in st.session_state:
         if st.session_state.active_user_id:
-            from cloud_storage import load_for_user
             loaded_df, source = load_for_user(cloud_store, st.session_state.active_user_id, default_checklist_df)
             st.session_state.checklist_df = loaded_df
-            from streamlit_app import dataframe_signature
             st.session_state.last_saved_signature = dataframe_signature(loaded_df)
             st.session_state.cloud_status = f"Loaded {source} data using {cloud_store.backend_name}."
         st.session_state.cloud_bootstrap_done = True
@@ -118,7 +120,6 @@ def render_sidebar(
             st.sidebar.error(f"Invalid JSON text: {err}")
     
     if st.sidebar.button("Load from Google Sheets"):
-        from streamlit_app import get_gsheet_client, load_sheet_to_df
         if not spreadsheet_id or not sheet_name or service_account_info is None:
             st.sidebar.warning("Provide Spreadsheet ID, worksheet name/user ID, and service account credentials first.")
         else:
@@ -134,7 +135,6 @@ def render_sidebar(
                 st.sidebar.error(f"Unable to load Google Sheet: {err}")
     
     if st.sidebar.button("Save to Google Sheets"):
-        from streamlit_app import get_gsheet_client, write_df_to_sheet
         if not spreadsheet_id or not sheet_name or service_account_info is None:
             st.sidebar.warning("Provide Spreadsheet ID, worksheet name/user ID, and service account credentials first.")
         else:
