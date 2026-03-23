@@ -177,7 +177,7 @@ def apply_glass_effect_styling():
     
     /* Alternating row colors in data editor table */
     div[data-testid="stDataFrameResizable"] tbody tr:nth-child(odd) td {
-        background-color: #dbeafe !important;
+        background-color: #ffffff !important;
     }
     
     div[data-testid="stDataFrameResizable"] tbody tr:nth-child(even) td {
@@ -185,14 +185,25 @@ def apply_glass_effect_styling():
     }
     
     div[data-testid="stDataFrameResizable"] tbody tr:hover td {
-        background-color: #bfdbfe !important;
+        background-color: #f0f9ff !important;
     }
     
-    /* Table header */
+    /* Table header - bold font */
     div[data-testid="stDataFrameResizable"] thead th {
         background-color: #3b82f6 !important;
         color: #ffffff !important;
         font-weight: 700 !important;
+        font-size: 14px !important;
+    }
+    
+    /* Done column styling - green when checked */
+    div[data-testid="stDataFrameResizable"] input[type="checkbox"]:checked {
+        accent-color: #10b981 !important;
+    }
+    
+    /* Green highlight for Done column cells with checked checkbox */
+    div[data-testid="stDataFrameResizable"] tbody tr td:has(input[type="checkbox"]:checked) {
+        background-color: #d1fae5 !important;
     }
     </style>
     """
