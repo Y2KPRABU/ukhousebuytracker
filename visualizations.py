@@ -175,47 +175,24 @@ def apply_glass_effect_styling():
         transform: translateY(-2px) !important;
     }
     
-    /* Alternating row colors in data editor table - aggressive override */
-    table tbody tr:nth-child(odd) {
-        background-color: rgba(219, 234, 254, 0.7) !important;
+    /* Alternating row colors in data editor table */
+    div[data-testid="stDataFrameResizable"] tbody tr:nth-child(odd) td {
+        background-color: #dbeafe !important;
     }
     
-    table tbody tr:nth-child(even) {
-        background-color: rgba(147, 197, 253, 0.3) !important;
+    div[data-testid="stDataFrameResizable"] tbody tr:nth-child(even) td {
+        background-color: #ffffff !important;
     }
     
-    table tbody tr:hover {
-        background-color: rgba(96, 165, 250, 0.5) !important;
+    div[data-testid="stDataFrameResizable"] tbody tr:hover td {
+        background-color: #bfdbfe !important;
     }
     
-    table tbody td {
-        background-color: inherit !important;
-    }
-    
-    /* Table header styling */
-    table thead {
-        background: linear-gradient(135deg, rgba(147, 197, 253, 0.7), rgba(96, 165, 250, 0.7)) !important;
-    }
-    
-    table thead th {
-        background: linear-gradient(135deg, rgba(147, 197, 253, 0.7), rgba(96, 165, 250, 0.7)) !important;
-        color: #0c4a6e !important;
+    /* Table header */
+    div[data-testid="stDataFrameResizable"] thead th {
+        background-color: #3b82f6 !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
-        border: 1px solid rgba(96, 165, 250, 0.7) !important;
-    }
-    
-    /* Target all tr elements directly */
-    tr {
-        background-color: inherit !important;
-    }
-    
-    /* Override Streamlit's default grey */
-    [role="grid"] {
-        --text-color: #0c4a6e !important;
-    }
-    
-    [role="gridcell"] {
-        background-color: inherit !important;
     }
     </style>
     """
