@@ -1,6 +1,22 @@
 /* Reduce default Streamlit top padding */
 .stAppViewBlockContainer {
-    padding-top: 1rem !important;
+    padding-top: 0.5rem !important;
+}
+
+/* Collapse gap between the title block and the next element */
+.stAppViewBlockContainer > div:first-child {
+    margin-bottom: 0 !important;
+}
+
+/* Remove extra top margin Streamlit adds to iframe/html blocks */
+.stHtml {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Tighten vertical gap between all top-level block elements */
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlockBorderWrapper"]:first-child {
+    margin-bottom: 0 !important;
 }
 
 /* Glass effect for form buttons */

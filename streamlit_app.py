@@ -56,8 +56,12 @@ st.set_page_config(
 # Apply glass effect styling
 apply_glass_effect_styling()
 
-st.title("🏠 UK Resale House Buying Checklist")
-st.write("Track your journey from offer to keys.")
+st.html(
+    "<h1 style='margin:0 0 2px 0; padding:0; font-size:1.6rem; line-height:1.2;'>"
+    "\U0001f3e0 UK Resale House Buying Checklist</h1>"
+    "<p style='margin:0 0 8px 0; padding:0; color:#64748b; font-size:0.9rem;'>"
+    "Track your journey from offer to keys.</p>"
+)
 
 DATA_FILE = "housebuy_checklist.json"
 DEFAULT_SHEET_NAME = "Checklist"
