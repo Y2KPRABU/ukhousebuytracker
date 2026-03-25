@@ -54,7 +54,7 @@ def build_pie_figure(section_data, selected_section):
 
     options = {
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} items"},
-        "legend": {"type": "scroll", "orient": "vertical", "right": "-100px", "bottom": "10px"},
+        "legend": {"type": "scroll", "orient": "vertical", "right": "5px", "top": "middle", "bottom": "10px"},
         "graphic": [{
             "type": "text",
             "left": "45%",

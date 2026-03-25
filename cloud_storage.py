@@ -187,6 +187,44 @@ def build_store_from_env() -> BaseChecklistStore:
     return LocalJsonChecklistStore()
 
 
+def merge_with_canonical(loaded_df: pd.DataFrame, default_df: pd.DataFrame) -> pd.DataFrame:
+    """Overlay saved user progress onto the canonical JSON structure.
+
+    Always returns a DataFrame with every section/item defined in default_df.
+    Progress columns (Done, notes, etc.) are copied from loaded_df where the
+    (Section, Item) key matches, so stale or renamed sections never cause rows
+    to vanish from the UI.
+    """
+    user_cols = [
+        "Done",
+        "Pending With",
+        "Date Completed",
+        "Notes",
+        "Tested certificate available",
+    ]
+    result = default_df.copy()
+    if loaded_df is None or loaded_df.empty:
+        return result
+
+    try:
+        loaded_indexed = loaded_df.set_index(["Section", "Item"])
+    except KeyError:
+        return result
+
+    for col in user_cols:
+        if col not in loaded_indexed.columns:
+            continue
+        result[col] = result.apply(
+            lambda row, c=col: (
+                loaded_indexed.at[(row["Section"], row["Item"]), c]
+                if (row["Section"], row["Item"]) in loaded_indexed.index
+                else row[c]
+            ),
+            axis=1,
+        )
+    return result
+
+
 def load_for_user(store: BaseChecklistStore, user_id: str, default_df: pd.DataFrame) -> Tuple[pd.DataFrame, str]:
     if not user_id.strip():
         return normalize_df(default_df), "anonymous-default"
@@ -195,7 +233,8 @@ def load_for_user(store: BaseChecklistStore, user_id: str, default_df: pd.DataFr
     if loaded_df is None or loaded_df.empty:
         return normalize_df(default_df), "default"
 
-    return normalize_df(loaded_df), "cloud"
+    merged = merge_with_canonical(normalize_df(loaded_df), normalize_df(default_df))
+    return normalize_df(merged), "cloud"
 
 
 def save_for_user(store: BaseChecklistStore, user_id: str, df: pd.DataFrame) -> Tuple[bool, str]:

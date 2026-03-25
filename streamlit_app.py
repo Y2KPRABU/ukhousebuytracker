@@ -1,9 +1,14 @@
-import json
 import os
 
-import pandas as pd
 import streamlit as st
 
+from checklist_data import (
+    load_checklist_json,
+    build_df_from_json,
+    reorder_by_json,
+    dataframe_signature,
+    enforce_ta_forms_order,
+)
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
 from visualizations import build_pie_figure, render_pie_with_progress, apply_glass_effect_styling
 from sidebar_config import render_sidebar
@@ -57,90 +62,9 @@ st.write("Track your journey from offer to keys.")
 DATA_FILE = "housebuy_checklist.json"
 DEFAULT_SHEET_NAME = "Checklist"
 
-# Load checklist definition from JSON
-if os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-else:
+data = load_checklist_json(DATA_FILE)
+if not os.path.exists(DATA_FILE):
     st.warning(f"Checklist file '{DATA_FILE}' not found. Using default checklist.")
-    data = {
-        "Initial Stage": [
-            "Memorandum of Sale (from Agent)",
-            "ID & AML Checks (Passport/Address)",
-            "Client Care Pack (Signed)"
-        ],
-        "Legal & Searches": [
-            "TA6 Property Info Form (Check FENSA)",
-            "TA10 Fittings/Contents Form",
-            "Local Authority & Environmental Searches",
-            "Report on Title (Read & Signed)"
-        ],
-        "Exchange & Completion": [
-            "Buildings Insurance (Active today!)",
-            "Transfer Deed (TR1) Signed",
-            "Exchange Deposit Paid",
-            "Completion Statement Received",
-            "Key Collection"
-        ]
-    }
-
-# Build a DataFrame with required columns
-def build_df_from_json(checklist_data):
-    rows = []
-    for section, items in checklist_data.items():
-        for item in items:
-            rows.append({
-                "Section": section,
-                "Item": item,
-                "Done": False,
-                "Pending With": "",
-                "Date Completed": "",
-                "Notes": "",
-                "Tested certificate available": False
-            })
-    return pd.DataFrame(rows)
-
-
-def reorder_by_json(df: pd.DataFrame, canonical_data: dict) -> pd.DataFrame:
-    """Reorder DataFrame rows to match the section/item order defined in the JSON."""
-    order_map = {}
-    idx = 0
-    for section, items in canonical_data.items():
-        for item in items:
-            order_map[(section, item)] = idx
-            idx += 1
-    sort_keys = df.apply(
-        lambda row: order_map.get((row["Section"], row["Item"]), len(order_map)),
-        axis=1,
-    )
-    return df.iloc[sort_keys.argsort(kind="stable")].reset_index(drop=True)
-
-
-def dataframe_signature(df):
-    """Create a stable signature so autosave runs only when table content changes."""
-    as_text = df.fillna("").astype(str)
-    return str(pd.util.hash_pandas_object(as_text, index=True).sum())
-
-
-def enforce_ta_forms_order(df):
-    """If solicitor has been instructed, ensure TA6/TA10 are in Legal & Searches and prioritized."""
-    if "Item" not in df.columns or "Done" not in df.columns:
-        return df
-
-    instruct_idx = df.index[df["Item"] == "Instruct solicitor"]
-    if len(instruct_idx) and df.at[instruct_idx[0], "Done"]:
-        # move TA6/TA10 into Legal & Searches
-        for ta_item in ["TA6 Property Info Form (Check FENSA)", "TA10 Fittings/Contents Form"]:
-            if ta_item in df["Item"].values:
-                ta_idx = df.index[df["Item"] == ta_item][0]
-                df.at[ta_idx, "Section"] = "Legal & Searches"
-
-        # Reorder so Legal & Searches rows come after the current section with not-done tasks
-        legal_rows = df[df["Section"] == "Legal & Searches"]
-        other_rows = df[df["Section"] != "Legal & Searches"]
-        df = pd.concat([other_rows, legal_rows], ignore_index=True)
-
-    return df
 
 
 cloud_store = build_store_from_env()
