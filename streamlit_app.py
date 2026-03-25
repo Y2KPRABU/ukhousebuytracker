@@ -38,7 +38,7 @@ bootstrap_env_from_streamlit_secrets()
 
 
 st.set_page_config(
-    page_title="UK House Buying Checklist",
+    page_title="UK Resale House Buying Checklist",
     page_icon="🏠",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -56,7 +56,7 @@ st.set_page_config(
 # Apply glass effect styling
 apply_glass_effect_styling()
 
-st.title("🏠 UK House Buying Checklist")
+st.title("🏠 UK Resale House Buying Checklist")
 st.write("Track your journey from offer to keys.")
 
 DATA_FILE = "housebuy_checklist.json"

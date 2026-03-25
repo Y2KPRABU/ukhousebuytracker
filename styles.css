@@ -1,3 +1,8 @@
+/* Reduce default Streamlit top padding */
+.stAppViewBlockContainer {
+    padding-top: 1rem !important;
+}
+
 /* Glass effect for form buttons */
 button[kind="form"] {
     background: linear-gradient(135deg, rgba(219, 234, 254, 0.7), rgba(191, 219, 254, 0.7)) !important;
