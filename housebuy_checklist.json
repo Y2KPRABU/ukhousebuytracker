@@ -50,19 +50,31 @@
    ],
    "Buyer PreChecks through Solicitor": [
     "If Extensions or alterations are present, request planning permissions and regulation certificates",
-    "Ask for FENSA certificates for New or replaced glass doors/windows",
+    "Ask for FENSA certificates for New or replaced glass doors/windows, This is Structural integrity violation and can cause insurance and safety issues",
     "Ask for boiler Gas Safety installation certificate",
     "Ask for rewiring EIC/EICR certificates",
-    "Collect boiler service records"
+    "Collect boiler service records",
+"If any of the above certificates are not provided, ask for regularization certificate if work done without Planning Permission/Building Regulations", 
+"Calculate cost for tests or regularization of building planning permissions , FENSA, Gas Safety, EICR, and other certificates, and negotiate price reduction based on these costs if these certificates are not provided by seller solicitor ",
+"Get Quotes from Builders for above missing certificates and regularization, and negotiate price reduction based on these costs if these certificates are not provided by seller solicitor"
   ],
   
   "Survey & Reports": [
     "Arrange basic valuation survey",
     "Arrange RICS HomeBuyer report",
     "Review survey report (recommendations & costs)",
-    "Raise repairs/search queries with seller solicitor",
-    "Confirm FENSA compliance for glazing/doors"
-  ],
+    "Raise repairs/search queries with seller solicitor through our (buyer) solicitor",
+    "Review seller solicitor replies to above queries and survey report recommendations"],
+    "First Round of Negotiations":[
+    "Negotiate price based on survey report recommendations and other factors",
+    "Negotiate on fixtures/fittings included based on survey report recommendations and other factors", 
+    "Check for additional test and certifcates for any issues found in survey report, eg damp, woodworm, roof issues, structural issues, and ask for these to be provided by seller solicitor if not already provided ",
+    "Calculate cost for tests or regularization of building planning permissions , FENSA, Gas Safety, EICR, and other certificates, and negotiate price reduction based on these costs if these certificates are not provided by seller solicitor"
+    ],
+    "Buyer Mortgage Application": [
+    "Submit mortgage application with survey report and other documents",
+    "Mortgage offer received and checked",
+    "Mortgage offer accepted and returned to lender"],
   "Order Paid Searches Now": [
     "Local Authority Searches, Mandatory search that checks for planning permissions, building regulations, enforcement actions, and other local authority information related to the property",
     "Environmental Searches (ground stability, flood risk, contaminated land), Mandatory- if Mortgaged ",
