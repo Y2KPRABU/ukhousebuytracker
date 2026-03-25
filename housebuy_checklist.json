@@ -1,7 +1,15 @@
 {
+  "Buyer Pre-Offer Stage": [
+    "Check your finances and get a mortgage agreement in principle (AIP)",
+    "Once Address is Known, Even before Appointment, do the below",
+    "Research the area, distance from schools, flood chance, crime rates",
+    "Do subsidence checks, coal mine area, radon exposure checks, these are free to check online",
+    "Above line may look simple, but stuff like coal mine and subsidene chceks in paid reports make or break a decision, why wait for solicitors to ask for it and pay for it",
+    "Download Energy Performance Certificate (EPC) online for free for the property, It shows AgeBand, when the property was built, and its area, energy rating"
+  ],
   "Viewing Checks with Agent": [
     "Agents say we dont know to any of this, Solicitor will get this info, Just ask them you dont want to see the certificates, but absence of this means illegal constructions and council can fine you 50£ per day and ask you to demolish the extension, so you want to be sure about this before you make an offer !!!",
-    "Energy Performance Certificate (EPC) for the property, It shows AgeBand, when the property was built, and its area, energy rating",
+    
     "Check if House has New WC Room Added, Ensuite, Kitchen, Bathroom extensions",
     "Check for loft extensions",
     "Check for garage conversions/demolitions/conservatory extensions, some of these may not need planning permissions but may need building regulations",
@@ -55,16 +63,16 @@
     "Raise repairs/search queries with seller solicitor",
     "Confirm FENSA compliance for glazing/doors"
   ],
-  "Legal & Searches": [
-    "TA6 Property Information Form",
-    "TA10 Fittings and Contents Form",
-    "Local Authority Searches",
-    "Environmental Searches",
-    "Water and Drainage Search",
-    "Chancel Repair Liability Search",
-    "Report on Title (Read & Signed)",
+  "Order Paid Searches Now": [
+    "Local Authority Searches, Mandatory search that checks for planning permissions, building regulations, enforcement actions, and other local authority information related to the property",
+    "Environmental Searches (ground stability, flood risk, contaminated land), Mandatory- if Mortgaged ",
+    "Water and Drainage Search (checks if property is connected to mains water and sewerage, and if there are any public drains on the property) Mandatory- if Mortgaged",
+    "Chancel Repair Liability Search" 
+  ],
+  "Buyer Solicitor Tasks": [
+    "Analyses above paid search reports and creates a Report on Title (Read & Signed)",
     "Review replies to pre-contract enquiries",
-    "Mortgage offer received and checked",
+    "Mortgage offer received in Portal and checked",
     "Gazumping/gazundering risk managed"
   ],
   "Offers & Negotiation": [
