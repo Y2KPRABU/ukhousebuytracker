@@ -31,12 +31,12 @@
     "1 day, Memorandum of Sale (from Agent)",
     "1 to 2 days, ID & AML Checks (Passport/Address)",
     "1 -3 days, Client Care Pack Sent from Agent to Buyer (Signed)",
-    "Agree offer and acceptance terms",
+    "Agree offer and acceptance terms, fixtures,fittings, deposit, completion date, and ask agent to send you a written confirmation of these details, this will be useful for solicitor instructions and future reference",
     "Estate agent confirmation of agreed sale price",
-    "Register with conveyancer/solicitor",
+    "Register with conveyancer/solicitor - Cost 50-300£ Registration charges on Day 1 of instruction",
     "Instruct solicitor"
   ],
-   "Buyer Solicitor Instructed Stage": [
+   "Buyer Solicitor Instructed": [
     "Most of these documents are received on day of instruction or within 3 days, They dont send to Buyer, we have to ask them to send over",
     "Contract of Sale (Draft)",
     "Title Plan Contains a B/W map of the property and its boundaries",
@@ -48,14 +48,12 @@
     "TA7 Leasehold Information Form (if applicable)",
     "TA10 Fittings and Contents Form, this form should match what you agreed with agent"
    ],
-   "Buyer PreChecks through Solicitor": [
+   "Buyer PreChecks Round 1 Negotiations": [
     "If Extensions or alterations are present, request planning permissions and regulation certificates",
     "Ask for FENSA certificates for New or replaced glass doors/windows, This is Structural integrity violation and can cause insurance and safety issues",
     "Ask for boiler Gas Safety installation certificate",
     "Ask for rewiring EIC/EICR certificates",
-    "Collect boiler service records"
-  ],
-  "Buyer First Round - Certificate Checks Negotiations":[
+    "Collect boiler service records",
     "Negotiate on fixtures/fittings included based on above checks and other factors", 
     "Check for missing test and certifcates from above step ",
     "Calculate cost for tests or regularization of building planning permissions , FENSA, Gas Safety, EICR, and other certificates",
@@ -81,7 +79,7 @@
     "Submit mortgage application with survey report and other documents",
     "Mortgage offer received and checked",
     "Mortgage offer accepted and returned to lender"],
-  "Order Paid Searches Now": [
+  "Order Paid Searches Now through Solicitor": [
     "Local Authority Searches, Mandatory search that checks for planning permissions, building regulations, enforcement actions, and other local authority information related to the property",
     "Environmental Searches (ground stability, flood risk, contaminated land), Mandatory- if Mortgaged ",
     "Water and Drainage Search (checks if property is connected to mains water and sewerage, and if there are any public drains on the property) Mandatory- if Mortgaged",
