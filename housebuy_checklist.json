@@ -1,25 +1,52 @@
 {
-  "Initial Stage": [
-    "Memorandum of Sale (from Agent)",
-    "ID & AML Checks (Passport/Address)",
-    "Client Care Pack (Signed)",
+  "Viewing Checks with Agent": [
+    "If Agents say no to any of this, Solicitor will get this info, Just ask them you dont want to see the certificates, but absence of this means illegal constructions and council can fine you 50£ per day and ask you to demolish the extension, so you want to be sure about this before you make an offer !!!",
+    "Check if House has New WC Room Added, Ensuite, Kitchen, Bathroom extensions",
+    "Check for loft extensions",
+    "Check for garage conversions/demolitions/conservatory extensions, some of these may not need planning permissions but may need building regulations",
+    "If yes, Check if seller has Planning Permissions and Building Completion Certificates for above",
+    "If No, Check for Reqularization certificate if work done without Planning Permission/Building Regulations",
+    "Check for window/door replacements",
+    "Check for FENSA certificates for glass doors/windows",
+    "If No, Check for Reqularization certificate if work done without Planning Permission/Building Regulations",
+    "Check for boiler replacements",
+    "If yes, check for boiler Gas Safety installation certificate",
+    "Check for rewiring/ electrical work done",
+    "If yes, check for rewiring EIC/EICR certificates",
+    "If Agents say no, Follow this up once Soicitor is instructed"
+  ],
+  "Offer Acceptance Stage with Agent": [
+    "Agree on What is included in the sale (fixtures/fittings), This will need to be included in TA6 Form in future steps",
+    "Agree on deposit amount and date",
+    "Agree on tentative completion date",
+    "1 day, Memorandum of Sale (from Agent)",
+    "1 to 2 days, ID & AML Checks (Passport/Address)",
+    "1 -3 days, Client Care Pack Sent from Agent to Buyer (Signed)",
     "Agree offer and acceptance terms",
     "Estate agent confirmation of agreed sale price",
     "Register with conveyancer/solicitor",
     "Instruct solicitor"
   ],
-  "Buyer PreChecks": [
-    "Check if seller has extensions",
-    "Check for window/door/roof/utility replacements",
+   "Docs from Seller's Solicitor to Our Solicitor": [
+    "Most of these documents are received on day of instruction or within 3 days, They dont send to Buyer, we have to ask them to send over",
+    "Contract of Sale (Draft)",
+    "Title Plan Contains a B/W map of the property and its boundaries",
+    "Title Register Contains details of the property ownership and any restrictions or covenants",
+    "Official Copy of Conveyance (OCON)",
+    "Letter of Instruction (from Buyer Solicitor to Seller's Solicitor), Check your names spelling and address details are correct",
+    "TA6 Property Information Form, Very important form, contains details about the property, its boundaries, rights of way, disputes, services, and other important information. Review this form carefully and raise any questions or concerns with the seller's solicitor.",
+    "TA6 Section 5.1 a) is for Windows Door Additions, b) for extensions, i) for any other alterations (eg Added Ensuite or WC ) , if any of these are yes,  and check if they have planning permissions and building regulations certificates, if not ask for regularization certificate",
+    "TA7 Leasehold Information Form (if applicable)",
+    "TA10 Fittings and Contents Form"
+   ],
+   "Buyer PreChecks through Solicitor": [
     "If yes, request planning permissions and regulation certificates",
     "Ask for FENSA certificates for glass doors/windows",
     "Ask for boiler Gas Safety installation certificate",
     "Ask for rewiring EIC/EICR certificates",
-    "Collect boiler service records",
-    "Check for asbestos in old chimney",
-    "Check for loft extensions",
-    "Check for garage conversions/demolitions/conservatory extensions"
+    "Collect boiler service records"
   ],
+  
   "Survey & Reports": [
     "Arrange basic valuation survey",
     "Arrange RICS HomeBuyer report",
