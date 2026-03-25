@@ -1,0 +1,71 @@
+/* Glass effect for form buttons */
+button[kind="form"] {
+    background: linear-gradient(135deg, rgba(219, 234, 254, 0.7), rgba(191, 219, 254, 0.7)) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1.5px solid rgba(147, 197, 253, 0.5) !important;
+    color: #0c4a6e !important;
+    font-weight: 600 !important;
+    box-shadow: 0 8px 32px rgba(30, 144, 255, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+button[kind="form"]:hover {
+    background: linear-gradient(135deg, rgba(191, 219, 254, 0.8), rgba(147, 197, 253, 0.8)) !important;
+    box-shadow: 0 12px 40px rgba(30, 144, 255, 0.2) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Glass effect for all buttons */
+button {
+    background: linear-gradient(135deg, rgba(219, 234, 254, 0.7), rgba(191, 219, 254, 0.7)) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1.5px solid rgba(147, 197, 253, 0.5) !important;
+    color: #0c4a6e !important;
+    font-weight: 600 !important;
+    box-shadow: 0 8px 32px rgba(30, 144, 255, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+button:hover {
+    background: linear-gradient(135deg, rgba(191, 219, 254, 0.8), rgba(147, 197, 253, 0.8)) !important;
+    box-shadow: 0 12px 40px rgba(30, 144, 255, 0.2) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Wrap text in all body cells so long items don't overflow */
+div[data-testid="stDataFrameResizable"] tbody tr td {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Alternating row colors in data editor table */
+div[data-testid="stDataFrameResizable"] tbody tr:nth-child(odd) td {
+    background-color: #ffffff !important;
+}
+
+div[data-testid="stDataFrameResizable"] tbody tr:nth-child(even) td {
+    background-color: #ffffff !important;
+}
+
+div[data-testid="stDataFrameResizable"] tbody tr:hover td {
+    background-color: #f0f9ff !important;
+}
+
+/* Table header - bold font */
+div[data-testid="stDataFrameResizable"] thead th {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+/* Done column styling - green when checked */
+div[data-testid="stDataFrameResizable"] input[type="checkbox"]:checked {
+    accent-color: #10b981 !important;
+}
+
+/* Green highlight for Done column cells with checked checkbox */
+div[data-testid="stDataFrameResizable"] tbody tr td:has(input[type="checkbox"]:checked) {
+    background-color: #d1fae5 !important;
+}

@@ -4,8 +4,12 @@ Handles donut charts and progress displays using streamlit-echarts.
 """
 
 import colorsys
+import os
+
 import streamlit as st
 from streamlit_echarts import st_echarts
+
+_CSS_PATH = os.path.join(os.path.dirname(__file__), "styles.css")
 
 
 def brighten_hex_color(hex_color, lightness_boost=0.16, saturation_boost=0.08):
@@ -136,75 +140,6 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
 
 
 def apply_glass_effect_styling():
-    """
-    Apply light blue glass effect to buttons and alternating row colors to data tables.
-    """
-    css = """
-    <style>
-    /* Glass effect for buttons */
-    button[kind="form"] {
-        background: linear-gradient(135deg, rgba(219, 234, 254, 0.7), rgba(191, 219, 254, 0.7)) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1.5px solid rgba(147, 197, 253, 0.5) !important;
-        color: #0c4a6e !important;
-        font-weight: 600 !important;
-        box-shadow: 0 8px 32px rgba(30, 144, 255, 0.1) !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    button[kind="form"]:hover {
-        background: linear-gradient(135deg, rgba(191, 219, 254, 0.8), rgba(147, 197, 253, 0.8)) !important;
-        box-shadow: 0 12px 40px rgba(30, 144, 255, 0.2) !important;
-        transform: translateY(-2px) !important;
-    }
-    
-    /* Glass effect for primary buttons */
-    button {
-        background: linear-gradient(135deg, rgba(219, 234, 254, 0.7), rgba(191, 219, 254, 0.7)) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1.5px solid rgba(147, 197, 253, 0.5) !important;
-        color: #0c4a6e !important;
-        font-weight: 600 !important;
-        box-shadow: 0 8px 32px rgba(30, 144, 255, 0.1) !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    button:hover {
-        background: linear-gradient(135deg, rgba(191, 219, 254, 0.8), rgba(147, 197, 253, 0.8)) !important;
-        box-shadow: 0 12px 40px rgba(30, 144, 255, 0.2) !important;
-        transform: translateY(-2px) !important;
-    }
-    
-    /* Alternating row colors in data editor table */
-    div[data-testid="stDataFrameResizable"] tbody tr:nth-child(odd) td {
-        background-color: #ffffff !important;
-    }
-    
-    div[data-testid="stDataFrameResizable"] tbody tr:nth-child(even) td {
-        background-color: #ffffff !important;
-    }
-    
-    div[data-testid="stDataFrameResizable"] tbody tr:hover td {
-        background-color: #f0f9ff !important;
-    }
-    
-    /* Table header - bold font */
-    div[data-testid="stDataFrameResizable"] thead th {
-        background-color: #3b82f6 !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        font-size: 14px !important;
-    }
-    
-    /* Done column styling - green when checked */
-    div[data-testid="stDataFrameResizable"] input[type="checkbox"]:checked {
-        accent-color: #10b981 !important;
-    }
-    
-    /* Green highlight for Done column cells with checked checkbox */
-    div[data-testid="stDataFrameResizable"] tbody tr td:has(input[type="checkbox"]:checked) {
-        background-color: #d1fae5 !important;
-    }
-    </style>
-    """
-    st.html(css)
+    """Inject styles.css into the Streamlit page."""
+    with open(_CSS_PATH, "r", encoding="utf-8") as f:
+        st.html(f"<style>{f.read()}</style>")

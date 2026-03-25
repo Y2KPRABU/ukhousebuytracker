@@ -236,7 +236,7 @@ if section_data:
                     num_rows='dynamic',
                     column_config={
                         'Section': st.column_config.TextColumn('Section', disabled=True),
-                        'Item': st.column_config.TextColumn('Item', disabled=True),
+                        'Item': st.column_config.TextColumn('Item', disabled=True, width="large"),
                         'Done': st.column_config.CheckboxColumn('Done'),
                         'Pending With': st.column_config.TextColumn('Pending With'),
                         'Date Completed': st.column_config.TextColumn('Date Completed'),
