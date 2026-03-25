@@ -10,7 +10,7 @@ from checklist_data import (
     enforce_ta_forms_order,
 )
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
-from visualizations import build_pie_figure, render_pie_with_progress, apply_glass_effect_styling
+from visualizations import build_pie_figure, render_pie_with_progress, apply_glass_effect_styling, render_checklist_html_table
 from sidebar_config import render_sidebar
 
 
@@ -229,50 +229,58 @@ if section_data:
         if not display_df.empty:
             st.caption(f"Current account: {st.session_state.get('cloud_user_input', st.session_state.active_user_id) or 'not set'}")
             st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
-            with st.form("checklist_edit_form", clear_on_submit=False):
-                edited_df = st.data_editor(
-                    display_df,
-                    width='stretch',
-                    num_rows='dynamic',
-                    column_config={
-                        'Section': st.column_config.TextColumn('Section', disabled=True),
-                        'Item': st.column_config.TextColumn('Item', disabled=True, width="large"),
-                        'Done': st.column_config.CheckboxColumn('Done'),
-                        'Pending With': st.column_config.TextColumn('Pending With'),
-                        'Date Completed': st.column_config.TextColumn('Date Completed'),
-                        'Notes': st.column_config.TextColumn('Notes'),
-                        'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
-                    }
-                )
-                save_clicked = st.form_submit_button("Save data")
 
-            if save_clicked:
-                if show_all:
-                    st.session_state.checklist_df = edited_df
-                else:
-                    mask = st.session_state.checklist_df['Section'] == selected_section
-                    st.session_state.checklist_df.loc[mask, edited_df.columns] = edited_df.values
+            # Read-only HTML table — full CSS text wrapping on Item column
+            render_checklist_html_table(display_df)
 
-                st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
-
-                current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
-                if not current_user:
-                    st.warning(
-                        "⚠️ **No Account ID set!** Your changes have been saved locally in this session, "
-                        "but they won't be saved to persistent storage. "
-                        "Please set an Account ID in the sidebar 'Account & Cloud Save' section to save to cloud."
+            # Edit in expander so the clean read view stays visible
+            with st.expander("\u270f\ufe0f Edit checklist items", expanded=False):
+                with st.form("checklist_edit_form", clear_on_submit=False):
+                    edited_df = st.data_editor(
+                        display_df,
+                        width='stretch',
+                        num_rows='dynamic',
+                        column_config={
+                            'Section': st.column_config.TextColumn('Section', disabled=True),
+                            'Item': st.column_config.TextColumn('Item', disabled=True, width="large"),
+                            'Done': st.column_config.CheckboxColumn('Done'),
+                            'Pending With': st.column_config.TextColumn('Pending With'),
+                            'Date Completed': st.column_config.TextColumn('Date Completed'),
+                            'Notes': st.column_config.TextColumn('Notes'),
+                            'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
+                        }
                     )
-                if current_user:
-                    ok, message = save_for_user(cloud_store, current_user, st.session_state.checklist_df)
-                    if ok:
-                        st.session_state.active_user_id = current_user
-                        st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
-                    else:
-                        st.session_state.cloud_status = f"Save failed: {message}"
-                else:
-                    st.session_state.cloud_status = "Saved in app session. Set Account ID to persist to storage."
+                    save_clicked = st.form_submit_button("Save data")
 
-                st.rerun()
+                if save_clicked:
+                    # Only update editable columns — never overwrite Item/Section from canvas output
+                    editable_cols = ['Done', 'Pending With', 'Date Completed', 'Notes', 'Tested certificate available']
+                    if show_all:
+                        st.session_state.checklist_df[editable_cols] = edited_df[editable_cols].values
+                    else:
+                        mask = st.session_state.checklist_df['Section'] == selected_section
+                        st.session_state.checklist_df.loc[mask, editable_cols] = edited_df[editable_cols].values
+
+                    st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
+
+                    current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
+                    if not current_user:
+                        st.warning(
+                            "\u26a0\ufe0f **No Account ID set!** Your changes have been saved locally in this session, "
+                            "but they won't be saved to persistent storage. "
+                            "Please set an Account ID in the sidebar 'Account & Cloud Save' section to save to cloud."
+                        )
+                    if current_user:
+                        ok, message = save_for_user(cloud_store, current_user, st.session_state.checklist_df)
+                        if ok:
+                            st.session_state.active_user_id = current_user
+                            st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
+                        else:
+                            st.session_state.cloud_status = f"Save failed: {message}"
+                    else:
+                        st.session_state.cloud_status = "Saved in app session. Set Account ID to persist to storage."
+
+                    st.rerun()
 
     pie_and_table(section_data, section_names, processed_df)
 

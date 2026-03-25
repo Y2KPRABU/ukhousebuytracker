@@ -4,6 +4,7 @@ Handles donut charts and progress displays using streamlit-echarts.
 """
 
 import colorsys
+import html as _html
 import os
 
 import streamlit as st
@@ -137,6 +138,65 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
                 st.session_state.selected_section = raw
                 st.session_state.selected_section_dropdown = raw
                 st.rerun(scope="fragment")
+
+
+def render_checklist_html_table(df) -> None:
+    """Render checklist DataFrame as a styled HTML table with full text wrapping."""
+    TABLE_CSS = """
+    <style>
+    body { margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+    .cl-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .cl-table thead th {
+        background:#3b82f6; color:#fff; font-weight:700;
+        padding:10px 12px; text-align:left;
+    }
+    .cl-table tbody td {
+        padding:8px 12px; border-bottom:1px solid #e2e8f0;
+        vertical-align:top; word-break:break-word; white-space:normal;
+    }
+    .cl-table tbody tr:hover td { background:#f0f9ff; }
+    .cl-table tbody tr.done td { background:#d1fae5; }
+    .cl-table .col-section { min-width:160px; font-weight:600; color:#1e40af; }
+    .cl-table .col-item    { min-width:280px; }
+    .cl-table .col-done    { text-align:center; width:50px; }
+    .cl-table .col-cert    { text-align:center; width:90px; }
+    .cl-table .col-pending { min-width:120px; }
+    .cl-table .col-date    { min-width:100px; }
+    .cl-table .col-notes   { min-width:150px; }
+    </style>
+    """
+    rows = []
+    for _, row in df.iterrows():
+        done = bool(row.get('Done', False))
+        cert = bool(row.get('Tested certificate available', False))
+        done_icon = "\u2705" if done else "\u2610"
+        cert_icon = "\u2705" if cert else "\u2014"
+        row_class = ' class="done"' if done else ''
+        section  = _html.escape(str(row.get('Section', '')))
+        item     = _html.escape(str(row.get('Item', '')))
+        pending  = _html.escape(str(row.get('Pending With', '') or ''))
+        date_c   = _html.escape(str(row.get('Date Completed', '') or ''))
+        notes    = _html.escape(str(row.get('Notes', '') or ''))
+        rows.append(
+            f'<tr{row_class}>'
+            f'<td class="col-section">{section}</td>'
+            f'<td class="col-item">{item}</td>'
+            f'<td class="col-done">{done_icon}</td>'
+            f'<td class="col-pending">{pending}</td>'
+            f'<td class="col-date">{date_c}</td>'
+            f'<td class="col-notes">{notes}</td>'
+            f'<td class="col-cert">{cert_icon}</td>'
+            '</tr>'
+        )
+    header = (
+        '<thead><tr>'
+        '<th>Section</th><th>Item</th><th>Done</th>'
+        '<th>Pending With</th><th>Date Completed</th>'
+        '<th>Notes</th><th>Certificate</th>'
+        '</tr></thead>'
+    )
+    html_body = TABLE_CSS + f'<table class="cl-table">{header}<tbody>{"" .join(rows)}</tbody></table>'
+    st.html(html_body, height=80 + len(df) * 55)
 
 
 def apply_glass_effect_styling():
