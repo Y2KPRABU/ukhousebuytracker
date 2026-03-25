@@ -101,7 +101,19 @@ def build_df_from_json(checklist_data):
     return pd.DataFrame(rows)
 
 
-
+def reorder_by_json(df: pd.DataFrame, canonical_data: dict) -> pd.DataFrame:
+    """Reorder DataFrame rows to match the section/item order defined in the JSON."""
+    order_map = {}
+    idx = 0
+    for section, items in canonical_data.items():
+        for item in items:
+            order_map[(section, item)] = idx
+            idx += 1
+    sort_keys = df.apply(
+        lambda row: order_map.get((row["Section"], row["Item"]), len(order_map)),
+        axis=1,
+    )
+    return df.iloc[sort_keys.argsort(kind="stable")].reset_index(drop=True)
 
 
 def dataframe_signature(df):
@@ -213,6 +225,9 @@ render_sidebar(
 )
 
 # Main interactive editor hidden as per request
+
+# Reorder rows to always match the JSON definition order before displaying
+st.session_state.checklist_df = reorder_by_json(st.session_state.checklist_df, data)
 
 # Calculate section statistics
 processed_df = enforce_ta_forms_order(st.session_state.checklist_df.copy())
