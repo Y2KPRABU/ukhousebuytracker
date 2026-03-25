@@ -207,22 +207,21 @@ def merge_with_canonical(loaded_df: pd.DataFrame, default_df: pd.DataFrame) -> p
         return result
 
     try:
-        loaded_indexed = loaded_df.set_index(["Section", "Item"])
-    except KeyError:
-        return result
-
-    for col in user_cols:
-        if col not in loaded_indexed.columns:
-            continue
-        result[col] = result.apply(
-            lambda row, c=col: (
-                loaded_indexed.at[(row["Section"], row["Item"]), c]
-                if (row["Section"], row["Item"]) in loaded_indexed.index
-                else row[c]
-            ),
-            axis=1,
+        # Merge on Section + Item to overlay user progress
+        merged = result.merge(
+            loaded_df[["Section", "Item"] + [c for c in user_cols if c in loaded_df.columns]],
+            on=["Section", "Item"],
+            how="left",
+            suffixes=("", "_loaded")
         )
-    return result
+        # Copy back loaded values, preferring non-null
+        for col in user_cols:
+            if f"{col}_loaded" in merged.columns:
+                merged[col] = merged[f"{col}_loaded"].fillna(merged[col])
+                merged = merged.drop(columns=[f"{col}_loaded"])
+        return merged
+    except Exception:
+        return result
 
 
 def load_for_user(store: BaseChecklistStore, user_id: str, default_df: pd.DataFrame) -> Tuple[pd.DataFrame, str]:
