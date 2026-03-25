@@ -54,18 +54,24 @@
     "Ask for boiler Gas Safety installation certificate",
     "Ask for rewiring EIC/EICR certificates",
     "Collect boiler service records",
-"If any of the above certificates are not provided, ask for regularization certificate if work done without Planning Permission/Building Regulations", 
-"Calculate cost for tests or regularization of building planning permissions , FENSA, Gas Safety, EICR, and other certificates, and negotiate price reduction based on these costs if these certificates are not provided by seller solicitor ",
-"Get Quotes from Builders for above missing certificates and regularization, and negotiate price reduction based on these costs if these certificates are not provided by seller solicitor"
   ],
-  
+  "Buyer First Round - Certificate Checks Negotiations":[
+    "Negotiate on fixtures/fittings included based on above checks and other factors", 
+    "Check for missing test and certifcates from above step ",
+    "Calculate cost for tests or regularization of building planning permissions , FENSA, Gas Safety, EICR, and other certificates",
+    "Get Quotes from Builders for above missing certificates and regularization, and negotiate price reduction based on these costs",
+    "Negotiate price based on above checks and other factors"
+
+
+  ],
   "Survey & Reports": [
-    "Arrange basic valuation survey",
-    "Arrange RICS HomeBuyer report",
+    "Arrange basic valuation survey (usually required by mortgage lender) or they do online valuation nowadays",
+    "Buyer Paid 400 to 700£- Arrange RICS HomeBuyer report",
     "Review survey report (recommendations & costs)",
     "Raise repairs/search queries with seller solicitor through our (buyer) solicitor",
     "Review seller solicitor replies to above queries and survey report recommendations"],
-    "First Round of Negotiations":[
+  
+  "Second Round- Survey based Negotiations": [
     "Negotiate price based on survey report recommendations and other factors",
     "Negotiate on fixtures/fittings included based on survey report recommendations and other factors", 
     "Check for additional test and certifcates for any issues found in survey report, eg damp, woodworm, roof issues, structural issues, and ask for these to be provided by seller solicitor if not already provided ",
@@ -85,13 +91,14 @@
     "Analyses above paid search reports and creates a Report on Title (Read & Signed)",
     "Review replies to pre-contract enquiries",
     "Mortgage offer received in Portal and checked",
-    "Gazumping/gazundering risk managed"
+    "Mortgage offer accepted and returned to lender"
   ],
-  "Offers & Negotiation": [
+  "Offers & Buyer Round 3 of Negotiation": [
     "Price negotiation completed",
     "Negotiated fixtures/fittings included",
     "Confirm deposit amount and date",
     "Agreement to completion date",
+    "Draft contract of sale and send to seller solicitor",
     "Solicitor/master plan for exchange agreed"
   ],
   "Exchange & Completion": [
