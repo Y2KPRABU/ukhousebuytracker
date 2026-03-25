@@ -195,8 +195,8 @@ def render_checklist_html_table(df) -> None:
         '<th>Notes</th><th>Certificate</th>'
         '</tr></thead>'
     )
-    html_body = TABLE_CSS + f'<table class="cl-table">{header}<tbody>{"" .join(rows)}</tbody></table>'
-    st.html(html_body, height=80 + len(df) * 55)
+    html_body = TABLE_CSS + f'<table class="cl-table">{header}<tbody>{"".join(rows)}</tbody></table>'
+    st.html(html_body)
 
 
 def apply_glass_effect_styling():
