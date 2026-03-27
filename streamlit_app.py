@@ -1,4 +1,5 @@
 import os
+import textwrap
 
 import streamlit as st
 
@@ -243,6 +244,18 @@ if section_data:
 
             with st.form("checklist_edit_form", clear_on_submit=False):
                 editor_df = display_df.copy()
+
+                # Streamlit's grid renderer does not reliably CSS-wrap canvas text,
+                # so inject line breaks for display to keep Item readable in-table.
+                if 'Item' in editor_df.columns:
+                    editor_df['Item'] = editor_df['Item'].apply(
+                        lambda v: textwrap.fill(str(v), width=56, break_long_words=False)
+                    )
+                if show_section_col and 'Section' in editor_df.columns:
+                    editor_df['Section'] = editor_df['Section'].apply(
+                        lambda v: textwrap.fill(str(v), width=28, break_long_words=False)
+                    )
+
                 if not show_section_col and 'Section' in editor_df.columns:
                     editor_df = editor_df.drop(columns=['Section'])
 
@@ -261,6 +274,7 @@ if section_data:
                     editor_df,
                     width='stretch',
                     num_rows='dynamic',
+                    row_height=64,
                     column_config=column_config
                 )
                 save_clicked = st.form_submit_button("Save data")
