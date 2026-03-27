@@ -202,4 +202,4 @@ def render_checklist_html_table(df) -> None:
 def apply_glass_effect_styling():
     """Inject styles.css into the Streamlit page."""
     with open(_CSS_PATH, "r", encoding="utf-8") as f:
-        st.html(f"<style>{f.read()}</style>")
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)

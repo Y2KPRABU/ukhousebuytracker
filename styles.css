@@ -73,6 +73,33 @@ div[data-testid*="stDataEditor"] tbody tr td:first-child {
     overflow-wrap: anywhere !important;
 }
 
+/* Fallback for role-based grid renderers used by newer Streamlit versions */
+div[data-testid*="stDataFrame"] [role="row"] [role="gridcell"],
+div[data-testid*="stDataEditor"] [role="row"] [role="gridcell"] {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+}
+
+div[data-testid*="stDataFrame"] [role="row"] [role="gridcell"] > div,
+div[data-testid*="stDataEditor"] [role="row"] [role="gridcell"] > div,
+div[data-testid*="stDataFrame"] [role="row"] [role="gridcell"] span,
+div[data-testid*="stDataEditor"] [role="row"] [role="gridcell"] span {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+}
+
+div[data-testid*="stDataFrame"] [role="rowgroup"] [role="row"]:nth-child(odd) [role="gridcell"],
+div[data-testid*="stDataEditor"] [role="rowgroup"] [role="row"]:nth-child(odd) [role="gridcell"] {
+    background-color: #ffffff !important;
+}
+
+div[data-testid*="stDataFrame"] [role="rowgroup"] [role="row"]:nth-child(even) [role="gridcell"],
+div[data-testid*="stDataEditor"] [role="rowgroup"] [role="row"]:nth-child(even) [role="gridcell"] {
+    background-color: #f0f7ff !important;
+}
+
 /* Alternating row colors in data editor table */
 div[data-testid="stDataFrameResizable"] tbody tr:nth-child(odd) td {
     background-color: #ffffff !important;

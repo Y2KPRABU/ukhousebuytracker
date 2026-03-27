@@ -243,9 +243,9 @@ if section_data:
                         'Section': st.column_config.TextColumn('Section', disabled=True, width="medium"),
                         'Item': st.column_config.TextColumn('Item', disabled=True, width="large"),
                         'Done': st.column_config.CheckboxColumn('Done'),
-                        'Pending With': st.column_config.TextColumn('Pending With'),
-                        'Date Completed': st.column_config.TextColumn('Date Completed'),
-                        'Notes': st.column_config.TextColumn('Notes'),
+                        'Pending With': st.column_config.TextColumn('Pending With', width="small"),
+                        'Date Completed': st.column_config.TextColumn('Date Completed', width="small"),
+                        'Notes': st.column_config.TextColumn('Notes', width="medium"),
                         'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
                     }
                 )
