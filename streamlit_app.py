@@ -1,4 +1,5 @@
 import os
+from html import escape
 
 import streamlit as st
 
@@ -12,6 +13,41 @@ from checklist_data import (
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
 from visualizations import build_pie_figure, render_pie_with_progress, apply_glass_effect_styling
 from sidebar_config import render_sidebar
+
+
+def render_wrapped_item_view(df, show_section_col=False):
+    """Render a wrapped read-only view for Item (and optional Section)."""
+    headers = ["Item"]
+    if show_section_col:
+        headers = ["Section", "Item"]
+
+    row_html = []
+    for _, row in df.iterrows():
+        if show_section_col:
+            section_val = escape(str(row.get("Section", "") or ""))
+            item_val = escape(str(row.get("Item", "") or ""))
+            row_html.append(
+                f"<tr><td class='item-view-section'>{section_val}</td><td class='item-view-item'>{item_val}</td></tr>"
+            )
+        else:
+            item_val = escape(str(row.get("Item", "") or ""))
+            row_html.append(f"<tr><td class='item-view-item'>{item_val}</td></tr>")
+
+    header_html = "".join([f"<th>{h}</th>" for h in headers])
+    table_html = (
+        "<style>"
+        ".item-view-table{width:100%;border-collapse:collapse;margin:0 0 0.5rem 0;font-size:0.93rem;}"
+        ".item-view-table thead th{background:#eff6ff;color:#1e3a8a;text-align:left;padding:0.55rem 0.7rem;border:1px solid #dbeafe;font-weight:700;}"
+        ".item-view-table tbody td{padding:0.5rem 0.7rem;border:1px solid #e2e8f0;vertical-align:top;"
+        "white-space:normal;word-break:break-word;overflow-wrap:anywhere;line-height:1.35;}"
+        ".item-view-table tbody tr:nth-child(even) td{background:#f8fbff;}"
+        ".item-view-table tbody tr:hover td{background:#eef6ff;}"
+        ".item-view-section{width:28%;min-width:140px;color:#334155;font-weight:600;}"
+        ".item-view-item{width:auto;}"
+        "</style>"
+        f"<table class='item-view-table'><thead><tr>{header_html}</tr></thead><tbody>{''.join(row_html)}</tbody></table>"
+    )
+    st.markdown(table_html, unsafe_allow_html=True)
 
 
 def bootstrap_env_from_streamlit_secrets():
@@ -240,14 +276,17 @@ if section_data:
         if not display_df.empty:
             st.caption(f"Current account: {st.session_state.get('cloud_user_input', st.session_state.active_user_id) or 'not set'}")
             st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
+            render_wrapped_item_view(display_df, show_section_col=show_section_col)
+            st.caption("Edit status fields below. Item text is shown above with wrapping.")
 
             with st.form("checklist_edit_form", clear_on_submit=False):
                 editor_df = display_df.copy()
+                if 'Item' in editor_df.columns:
+                    editor_df = editor_df.drop(columns=['Item'])
                 if not show_section_col and 'Section' in editor_df.columns:
                     editor_df = editor_df.drop(columns=['Section'])
 
                 column_config = {
-                    'Item': st.column_config.TextColumn('Item', disabled=True, width="large"),
                     'Done': st.column_config.CheckboxColumn('Done'),
                     'Pending With': st.column_config.TextColumn('Pending With', width="small"),
                     'Date Completed': st.column_config.TextColumn('Date Completed', width="small"),
@@ -261,6 +300,7 @@ if section_data:
                     editor_df,
                     width='stretch',
                     num_rows='dynamic',
+                    hide_index=True,
                     column_config=column_config
                 )
                 save_clicked = st.form_submit_button("Save data")
