@@ -53,11 +53,24 @@ button:hover {
     transform: translateY(-2px) !important;
 }
 
-/* Wrap text in all body cells so long items don't overflow */
-div[data-testid="stDataFrameResizable"] tbody tr td {
+/* Wrap text in editable/dataframe cells so long items don't overflow */
+div[data-testid="stDataFrameResizable"] tbody tr td,
+div[data-testid="stDataFrame"] [role="gridcell"],
+div[data-testid="stDataEditor"] [role="gridcell"],
+div[data-testid*="stDataFrame"] [role="gridcell"] > div,
+div[data-testid*="stDataEditor"] [role="gridcell"] > div {
     white-space: pre-wrap !important;
     word-break: break-word !important;
-    overflow-wrap: break-word !important;
+    overflow-wrap: anywhere !important;
+    line-height: 1.35 !important;
+}
+
+/* Ensure first visible column (Section) wraps on table-based renderers */
+div[data-testid*="stDataFrame"] tbody tr td:first-child,
+div[data-testid*="stDataEditor"] tbody tr td:first-child {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
 }
 
 /* Alternating row colors in data editor table */
@@ -66,19 +79,11 @@ div[data-testid="stDataFrameResizable"] tbody tr:nth-child(odd) td {
 }
 
 div[data-testid="stDataFrameResizable"] tbody tr:nth-child(even) td {
-    background-color: #ffffff !important;
+    background-color: #f0f7ff !important;
 }
 
 div[data-testid="stDataFrameResizable"] tbody tr:hover td {
-    background-color: #f0f9ff !important;
-}
-
-/* Table header - bold font */
-div[data-testid="stDataFrameResizable"] thead th {
-    background-color: #3b82f6 !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 14px !important;
+    background-color: #e0eeff !important;
 }
 
 /* Done column styling - green when checked */

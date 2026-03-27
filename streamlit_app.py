@@ -240,7 +240,7 @@ if section_data:
                     width='stretch',
                     num_rows='dynamic',
                     column_config={
-                        'Section': st.column_config.TextColumn('Section', disabled=True),
+                        'Section': st.column_config.TextColumn('Section', disabled=True, width="medium"),
                         'Item': st.column_config.TextColumn('Item', disabled=True, width="large"),
                         'Done': st.column_config.CheckboxColumn('Done'),
                         'Pending With': st.column_config.TextColumn('Pending With'),
