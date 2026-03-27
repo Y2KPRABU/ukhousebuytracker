@@ -209,7 +209,7 @@ if section_data:
         render_pie_with_progress(fig_options, section_data, selected_section, section_names)
 
         st.write("---")
-        cols = st.columns([1, 1])
+        cols = st.columns([1, 1, 1])
         with cols[0]:
             dropdown_options = ['All'] + section_names
             dropdown_index = dropdown_options.index(selected_section) if selected_section in dropdown_options else 0
@@ -225,6 +225,13 @@ if section_data:
             show_all = st.checkbox("Show all data", value=st.session_state.get('show_all', False))
             st.session_state.show_all = show_all
 
+        with cols[2]:
+            show_section_col = st.checkbox(
+                "Show Section column",
+                value=st.session_state.get('show_section_col', False)
+            )
+            st.session_state.show_section_col = show_section_col
+
         if show_all or selected_section == 'All':
             display_df = processed_df
         else:
@@ -235,19 +242,26 @@ if section_data:
             st.subheader(f"Checklist table: { 'All sections' if show_all else selected_section }")
 
             with st.form("checklist_edit_form", clear_on_submit=False):
+                editor_df = display_df.copy()
+                if not show_section_col and 'Section' in editor_df.columns:
+                    editor_df = editor_df.drop(columns=['Section'])
+
+                column_config = {
+                    'Item': st.column_config.TextColumn('Item', disabled=True, width="large"),
+                    'Done': st.column_config.CheckboxColumn('Done'),
+                    'Pending With': st.column_config.TextColumn('Pending With', width="small"),
+                    'Date Completed': st.column_config.TextColumn('Date Completed', width="small"),
+                    'Notes': st.column_config.TextColumn('Notes', width="medium"),
+                    'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
+                }
+                if show_section_col:
+                    column_config['Section'] = st.column_config.TextColumn('Section', disabled=True, width="medium")
+
                 edited_df = st.data_editor(
-                    display_df,
+                    editor_df,
                     width='stretch',
                     num_rows='dynamic',
-                    column_config={
-                        'Section': st.column_config.TextColumn('Section', disabled=True, width="medium"),
-                        'Item': st.column_config.TextColumn('Item', disabled=True, width="large"),
-                        'Done': st.column_config.CheckboxColumn('Done'),
-                        'Pending With': st.column_config.TextColumn('Pending With', width="small"),
-                        'Date Completed': st.column_config.TextColumn('Date Completed', width="small"),
-                        'Notes': st.column_config.TextColumn('Notes', width="medium"),
-                        'Tested certificate available': st.column_config.CheckboxColumn('Tested certificate available')
-                    }
+                    column_config=column_config
                 )
                 save_clicked = st.form_submit_button("Save data")
 
