@@ -3,4 +3,5 @@ pandas
 gspread
 google-auth
 streamlit-echarts
+streamlit-aggrid
 requests
