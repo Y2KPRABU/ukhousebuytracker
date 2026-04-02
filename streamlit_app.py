@@ -242,6 +242,8 @@ else:
     if not show_section_col and "Section" in editor_df.columns:
         editor_df = editor_df.drop(columns=["Section"])
 
+    st.caption(f"Grid input: {len(editor_df)} rows x {len(editor_df.columns)} columns")
+
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     if AgGrid is None or GridOptionsBuilder is None or GridUpdateMode is None:
         st.error("AgGrid is not available. Install/repair streamlit-aggrid and reload the app.")
@@ -249,22 +251,57 @@ else:
 
     try:
         gb = GridOptionsBuilder.from_dataframe(editor_df)
-        gb.configure_default_column(resizable=True, sortable=False, filter=False, wrapText=True, autoHeight=True)
+        gb.configure_default_column(resizable=True, sortable=False, filter=False)
 
         if "Section" in editor_df.columns:
-            gb.configure_column("Section", editable=False, width=220, wrapText=True, autoHeight=True)
+            gb.configure_column(
+                "Section",
+                editable=False,
+                width=220,
+                wrapText=True,
+                autoHeight=True,
+                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
+            )
         if "Item" in editor_df.columns:
-            gb.configure_column("Item", editable=False, width=560, wrapText=True, autoHeight=True)
+            gb.configure_column(
+                "Item",
+                editable=False,
+                width=560,
+                wrapText=True,
+                autoHeight=True,
+                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
+            )
         if "Initiator" in editor_df.columns:
-            gb.configure_column("Initiator", editable=False, width=170, wrapText=True, autoHeight=True)
+            gb.configure_column(
+                "Initiator",
+                editable=False,
+                width=170,
+                wrapText=True,
+                autoHeight=True,
+                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
+            )
         if "Done" in editor_df.columns:
             gb.configure_column("Done", editable=True, cellRenderer="agCheckboxCellRenderer", cellEditor="agCheckboxCellEditor", width=100)
         if "Pending With" in editor_df.columns:
-            gb.configure_column("Pending With", editable=True, width=190, wrapText=True, autoHeight=True)
+            gb.configure_column(
+                "Pending With",
+                editable=True,
+                width=190,
+                wrapText=True,
+                autoHeight=True,
+                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
+            )
         if "Date Completed" in editor_df.columns:
             gb.configure_column("Date Completed", editable=True, width=150)
         if "Notes" in editor_df.columns:
-            gb.configure_column("Notes", editable=True, width=360, wrapText=True, autoHeight=True)
+            gb.configure_column(
+                "Notes",
+                editable=True,
+                width=360,
+                wrapText=True,
+                autoHeight=True,
+                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
+            )
         if "Tested certificate available" in editor_df.columns:
             gb.configure_column(
                 "Tested certificate available",
@@ -277,7 +314,7 @@ else:
         gb.configure_grid_options(
             rowHeight=44,
             suppressHorizontalScroll=False,
-            ensureDomOrder=True,
+            domLayout="normal",
         )
 
         grid_response = AgGrid(
