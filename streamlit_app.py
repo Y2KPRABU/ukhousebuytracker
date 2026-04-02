@@ -313,9 +313,6 @@ else:
                 "line-height": "1.25 !important",
                 "word-break": "break-word !important",
             },
-            ".ag-theme-streamlit .ag-row": {
-                "height": "auto !important",
-            },
         }
 
         grid_response = AgGrid(
