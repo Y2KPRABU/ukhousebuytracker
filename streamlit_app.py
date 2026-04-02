@@ -259,7 +259,6 @@ else:
                 editable=False,
                 width=220,
                 wrapText=True,
-                autoHeight=True,
                 cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Item" in editor_df.columns:
@@ -268,7 +267,6 @@ else:
                 editable=False,
                 width=560,
                 wrapText=True,
-                autoHeight=True,
                 cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Initiator" in editor_df.columns:
@@ -277,7 +275,6 @@ else:
                 editable=False,
                 width=170,
                 wrapText=True,
-                autoHeight=True,
                 cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Done" in editor_df.columns:
@@ -288,7 +285,6 @@ else:
                 editable=True,
                 width=190,
                 wrapText=True,
-                autoHeight=True,
                 cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Date Completed" in editor_df.columns:
@@ -299,7 +295,6 @@ else:
                 editable=True,
                 width=360,
                 wrapText=True,
-                autoHeight=True,
                 cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Tested certificate available" in editor_df.columns:
@@ -312,7 +307,7 @@ else:
             )
 
         gb.configure_grid_options(
-            rowHeight=44,
+            rowHeight=72,
             suppressHorizontalScroll=False,
             domLayout="normal",
         )
