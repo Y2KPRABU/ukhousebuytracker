@@ -1,4 +1,5 @@
 import os
+import traceback
 
 import pandas as pd
 import streamlit as st
@@ -242,7 +243,11 @@ else:
         editor_df = editor_df.drop(columns=["Section"])
 
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
-    if AgGrid is not None and GridOptionsBuilder is not None and GridUpdateMode is not None:
+    if AgGrid is None or GridOptionsBuilder is None or GridUpdateMode is None:
+        st.error("AgGrid is not available. Install/repair streamlit-aggrid and reload the app.")
+        st.stop()
+
+    try:
         gb = GridOptionsBuilder.from_dataframe(editor_df)
         gb.configure_default_column(resizable=True, sortable=False, filter=False, wrapText=True, autoHeight=True)
 
@@ -287,15 +292,10 @@ else:
             key=f"checklist_aggrid_{selected_section}_{show_all}_{show_section_col}",
         )
         edited_df = pd.DataFrame(grid_response.get("data", editor_df))
-    else:
-        st.warning("Wrapped grid requires streamlit-aggrid. Using default editor fallback.")
-        edited_df = st.data_editor(
-            editor_df,
-            use_container_width=True,
-            hide_index=True,
-            disabled=[c for c in editor_df.columns if c not in editable_cols],
-            key="checklist_data_editor",
-        )
+    except Exception as err:
+        st.error(f"AgGrid render error: {type(err).__name__}: {err}")
+        st.code(traceback.format_exc(), language="text")
+        st.stop()
 
     if st.button("Save data", key="checklist_save_btn"):
         if show_all or selected_section == "All":
