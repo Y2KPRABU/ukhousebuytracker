@@ -3,13 +3,6 @@ import os
 import pandas as pd
 import streamlit as st
 
-try:
-    from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
-except Exception:
-    AgGrid = None
-    GridOptionsBuilder = None
-    GridUpdateMode = None
-
 from checklist_data import (
     load_checklist_json,
     build_df_from_json,
@@ -242,78 +235,13 @@ else:
         editor_df = editor_df.drop(columns=["Section"])
 
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
-    if AgGrid is None or GridOptionsBuilder is None or GridUpdateMode is None:
-        st.error("AgGrid is not available. Install/repair streamlit-aggrid and reload the app.")
-        st.stop()
-
-    try:
-        gb = GridOptionsBuilder.from_dataframe(editor_df)
-        gb.configure_default_column(resizable=True, sortable=False, filter=False)
-
-        if "Section" in editor_df.columns:
-            gb.configure_column(
-                "Section",
-                editable=False,
-                width=220,
-            )
-        if "Item" in editor_df.columns:
-            gb.configure_column(
-                "Item",
-                editable=False,
-                width=560,
-            )
-        if "Initiator" in editor_df.columns:
-            gb.configure_column(
-                "Initiator",
-                editable=False,
-                width=170,
-            )
-        if "Done" in editor_df.columns:
-            gb.configure_column("Done", editable=True, cellRenderer="agCheckboxCellRenderer", cellEditor="agCheckboxCellEditor", width=100)
-        if "Pending With" in editor_df.columns:
-            gb.configure_column(
-                "Pending With",
-                editable=True,
-                width=190,
-            )
-        if "Date Completed" in editor_df.columns:
-            gb.configure_column("Date Completed", editable=True, width=150)
-        if "Notes" in editor_df.columns:
-            gb.configure_column(
-                "Notes",
-                editable=True,
-                width=360,
-            )
-        if "Tested certificate available" in editor_df.columns:
-            gb.configure_column(
-                "Tested certificate available",
-                editable=True,
-                cellRenderer="agCheckboxCellRenderer",
-                cellEditor="agCheckboxCellEditor",
-                width=200,
-            )
-
-        gb.configure_grid_options(
-            rowHeight=44,
-            suppressHorizontalScroll=False,
-            domLayout="normal",
-        )
-
-        grid_response = AgGrid(
-            editor_df,
-            gridOptions=gb.build(),
-            theme="streamlit",
-            height=620,
-            fit_columns_on_grid_load=False,
-            update_mode=GridUpdateMode.VALUE_CHANGED,
-            allow_unsafe_jscode=False,
-            reload_data=False,
-            key=f"checklist_aggrid_{selected_section}_{show_all}_{show_section_col}",
-        )
-        edited_df = pd.DataFrame(grid_response.get("data", editor_df))
-    except Exception as err:
-        st.error(f"AgGrid render error: {type(err).__name__}: {err}")
-        st.stop()
+    edited_df = st.data_editor(
+        editor_df,
+        use_container_width=True,
+        hide_index=True,
+        disabled=[c for c in editor_df.columns if c not in editable_cols],
+        key="checklist_data_editor",
+    )
 
     if st.button("Save data", key="checklist_save_btn"):
         if show_all or selected_section == "All":
