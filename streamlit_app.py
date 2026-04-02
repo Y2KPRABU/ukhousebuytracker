@@ -264,8 +264,6 @@ else:
                 "Item",
                 editable=False,
                 width=560,
-                wrapText=True,
-                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Initiator" in editor_df.columns:
             gb.configure_column(
@@ -299,10 +297,26 @@ else:
             )
 
         gb.configure_grid_options(
-            rowHeight=72,
+            rowHeight=44,
             suppressHorizontalScroll=False,
             domLayout="normal",
         )
+
+        item_wrap_css = {
+            ".ag-theme-streamlit .ag-cell[col-id='Item']": {
+                "white-space": "normal !important",
+                "line-height": "1.25 !important",
+                "word-break": "break-word !important",
+            },
+            ".ag-theme-streamlit .ag-cell[col-id='Item'] .ag-cell-value": {
+                "white-space": "normal !important",
+                "line-height": "1.25 !important",
+                "word-break": "break-word !important",
+            },
+            ".ag-theme-streamlit .ag-row": {
+                "height": "auto !important",
+            },
+        }
 
         grid_response = AgGrid(
             editor_df,
@@ -313,6 +327,7 @@ else:
             update_mode=GridUpdateMode.VALUE_CHANGED,
             allow_unsafe_jscode=False,
             reload_data=False,
+            custom_css=item_wrap_css,
             key=f"checklist_aggrid_{selected_section}_{show_all}_{show_section_col}",
         )
         edited_df = pd.DataFrame(grid_response.get("data", editor_df))
