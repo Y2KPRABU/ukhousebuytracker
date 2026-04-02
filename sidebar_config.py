@@ -77,6 +77,25 @@ def render_sidebar(
             st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
         else:
             st.session_state.cloud_status = f"Save failed: {message}"
+
+    if st.sidebar.button("Overwrite account with latest format"):
+        target_user = cloud_user_input.strip()
+        if not target_user:
+            st.session_state.cloud_status = "Overwrite failed: Please enter an Account ID first."
+        else:
+            migrated_df, source = load_for_user(cloud_store, target_user, default_checklist_df)
+            ok, message = save_for_user(cloud_store, target_user, migrated_df)
+            if ok:
+                st.session_state.checklist_df = migrated_df
+                st.session_state.active_user_id = target_user
+                st.session_state.last_saved_signature = dataframe_signature(migrated_df)
+                st.session_state.cloud_status = (
+                    f"Overwrote account data with latest format via {cloud_store.backend_name} "
+                    f"(source: {source})."
+                )
+                st.rerun()
+            else:
+                st.session_state.cloud_status = f"Overwrite failed: {message}"
     
     # One-time default load for the active account on first run.
     if "cloud_bootstrap_done" not in st.session_state:
