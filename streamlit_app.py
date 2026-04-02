@@ -3,6 +3,13 @@ import os
 import pandas as pd
 import streamlit as st
 
+try:
+    from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
+except Exception:
+    AgGrid = None
+    GridOptionsBuilder = None
+    GridUpdateMode = None
+
 from checklist_data import (
     load_checklist_json,
     build_df_from_json,
@@ -11,7 +18,11 @@ from checklist_data import (
     enforce_ta_forms_order,
 )
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
-from visualizations import build_pie_figure, render_pie_with_progress, apply_glass_effect_styling
+from visualizations import (
+    build_pie_figure,
+    render_pie_with_progress,
+    apply_glass_effect_styling,
+)
 from sidebar_config import render_sidebar
 
 
@@ -231,13 +242,60 @@ else:
         editor_df = editor_df.drop(columns=["Section"])
 
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
-    edited_df = st.data_editor(
-        editor_df,
-        use_container_width=True,
-        hide_index=True,
-        disabled=[c for c in editor_df.columns if c not in editable_cols],
-        key="checklist_data_editor",
-    )
+    if AgGrid is not None and GridOptionsBuilder is not None and GridUpdateMode is not None:
+        gb = GridOptionsBuilder.from_dataframe(editor_df)
+        gb.configure_default_column(resizable=True, sortable=False, filter=False, wrapText=True, autoHeight=True)
+
+        if "Section" in editor_df.columns:
+            gb.configure_column("Section", editable=False, width=220, wrapText=True, autoHeight=True)
+        if "Item" in editor_df.columns:
+            gb.configure_column("Item", editable=False, width=560, wrapText=True, autoHeight=True)
+        if "Initiator" in editor_df.columns:
+            gb.configure_column("Initiator", editable=False, width=170, wrapText=True, autoHeight=True)
+        if "Done" in editor_df.columns:
+            gb.configure_column("Done", editable=True, cellRenderer="agCheckboxCellRenderer", cellEditor="agCheckboxCellEditor", width=100)
+        if "Pending With" in editor_df.columns:
+            gb.configure_column("Pending With", editable=True, width=190, wrapText=True, autoHeight=True)
+        if "Date Completed" in editor_df.columns:
+            gb.configure_column("Date Completed", editable=True, width=150)
+        if "Notes" in editor_df.columns:
+            gb.configure_column("Notes", editable=True, width=360, wrapText=True, autoHeight=True)
+        if "Tested certificate available" in editor_df.columns:
+            gb.configure_column(
+                "Tested certificate available",
+                editable=True,
+                cellRenderer="agCheckboxCellRenderer",
+                cellEditor="agCheckboxCellEditor",
+                width=200,
+            )
+
+        gb.configure_grid_options(
+            rowHeight=44,
+            suppressHorizontalScroll=False,
+            ensureDomOrder=True,
+        )
+
+        grid_response = AgGrid(
+            editor_df,
+            gridOptions=gb.build(),
+            theme="streamlit",
+            height=620,
+            fit_columns_on_grid_load=False,
+            update_mode=GridUpdateMode.VALUE_CHANGED,
+            allow_unsafe_jscode=False,
+            reload_data=False,
+            key=f"checklist_aggrid_{selected_section}_{show_all}_{show_section_col}",
+        )
+        edited_df = pd.DataFrame(grid_response.get("data", editor_df))
+    else:
+        st.warning("Wrapped grid requires streamlit-aggrid. Using default editor fallback.")
+        edited_df = st.data_editor(
+            editor_df,
+            use_container_width=True,
+            hide_index=True,
+            disabled=[c for c in editor_df.columns if c not in editable_cols],
+            key="checklist_data_editor",
+        )
 
     if st.button("Save data", key="checklist_save_btn"):
         if show_all or selected_section == "All":
