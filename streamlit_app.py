@@ -258,8 +258,6 @@ else:
                 "Section",
                 editable=False,
                 width=220,
-                wrapText=True,
-                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Item" in editor_df.columns:
             gb.configure_column(
@@ -274,8 +272,6 @@ else:
                 "Initiator",
                 editable=False,
                 width=170,
-                wrapText=True,
-                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Done" in editor_df.columns:
             gb.configure_column("Done", editable=True, cellRenderer="agCheckboxCellRenderer", cellEditor="agCheckboxCellEditor", width=100)
@@ -284,8 +280,6 @@ else:
                 "Pending With",
                 editable=True,
                 width=190,
-                wrapText=True,
-                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Date Completed" in editor_df.columns:
             gb.configure_column("Date Completed", editable=True, width=150)
@@ -294,8 +288,6 @@ else:
                 "Notes",
                 editable=True,
                 width=360,
-                wrapText=True,
-                cellStyle={"white-space": "normal", "line-height": "1.25", "wordBreak": "break-word"},
             )
         if "Tested certificate available" in editor_df.columns:
             gb.configure_column(
