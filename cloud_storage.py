@@ -15,6 +15,7 @@ except ImportError:
 EXPECTED_COLUMNS = [
     "Section",
     "Item",
+    "Initiator",
     "Done",
     "Pending With",
     "Date Completed",
@@ -53,7 +54,7 @@ def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
     for bool_col in ("Done", "Tested certificate available"):
         cleaned[bool_col] = cleaned[bool_col].fillna(False).astype(bool)
 
-    for text_col in ("Section", "Item", "Pending With", "Date Completed", "Notes"):
+    for text_col in ("Section", "Item", "Initiator", "Pending With", "Date Completed", "Notes"):
         cleaned[text_col] = cleaned[text_col].fillna("").astype(str)
 
     return cleaned

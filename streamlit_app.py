@@ -124,11 +124,15 @@ def load_sheet_to_df(spreadsheet_id, sheet_name, client):
     if not records:
         return pd.DataFrame()
     df = pd.DataFrame(records)
-    expected = ["Section", "Item", "Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
+    expected = ["Section", "Item", "Initiator", "Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     missing = [col for col in expected if col not in df.columns]
     if missing:
-        st.warning(f"Google Sheet missing columns: {missing}. Using JSON default schema.")
-        return pd.DataFrame()
+        # Backward compatibility for older sheets that predate Initiator.
+        if missing == ["Initiator"]:
+            df["Initiator"] = "NA"
+        else:
+            st.warning(f"Google Sheet missing columns: {missing}. Using JSON default schema.")
+            return pd.DataFrame()
     return df[expected]
 
 
@@ -255,6 +259,8 @@ if section_data:
                 gb.configure_column('Section', editable=False, wrapText=True, autoHeight=True, width=210)
             if 'Item' in editor_df.columns:
                 gb.configure_column('Item', editable=False, wrapText=True, autoHeight=True, width=520)
+            if 'Initiator' in editor_df.columns:
+                gb.configure_column('Initiator', editable=False, width=140)
             if 'Done' in editor_df.columns:
                 gb.configure_column('Done', editable=True, cellRenderer='agCheckboxCellRenderer', cellEditor='agCheckboxCellEditor', width=95)
             if 'Pending With' in editor_df.columns:

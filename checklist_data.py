@@ -41,12 +41,19 @@ def load_checklist_json(data_file: str) -> dict:
 
 def build_df_from_json(checklist_data: dict) -> pd.DataFrame:
     """Build a DataFrame with all required columns from the checklist dict."""
+    def parse_item_entry(entry):
+        if isinstance(entry, dict):
+            return str(entry.get("Item", "")).strip(), str(entry.get("Initiator", "NA")).strip() or "NA"
+        return str(entry), "NA"
+
     rows = []
     for section, items in checklist_data.items():
         for item in items:
+            item_text, initiator = parse_item_entry(item)
             rows.append({
                 "Section": section,
-                "Item": item,
+                "Item": item_text,
+                "Initiator": initiator,
                 "Done": False,
                 "Pending With": "",
                 "Date Completed": "",
@@ -58,11 +65,16 @@ def build_df_from_json(checklist_data: dict) -> pd.DataFrame:
 
 def reorder_by_json(df: pd.DataFrame, canonical_data: dict) -> pd.DataFrame:
     """Reorder DataFrame rows to match the section/item order defined in the JSON."""
+    def canonical_item_text(entry):
+        if isinstance(entry, dict):
+            return str(entry.get("Item", "")).strip()
+        return str(entry)
+
     order_map = {}
     idx = 0
     for section, items in canonical_data.items():
         for item in items:
-            order_map[(section, item)] = idx
+            order_map[(section, canonical_item_text(item))] = idx
             idx += 1
     sort_keys = df.apply(
         lambda row: order_map.get((row["Section"], row["Item"]), len(order_map)),
