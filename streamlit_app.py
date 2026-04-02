@@ -11,7 +11,7 @@ from checklist_data import (
     enforce_ta_forms_order,
 )
 from cloud_storage import build_store_from_env, load_for_user, save_for_user
-from visualizations import apply_glass_effect_styling
+from visualizations import build_pie_figure, render_pie_with_progress, apply_glass_effect_styling
 from sidebar_config import render_sidebar
 
 
@@ -175,6 +175,29 @@ if "selected_section" not in st.session_state:
 
 if st.session_state.selected_section != "All" and st.session_state.selected_section not in section_names:
     st.session_state.selected_section = "All"
+
+if section_names:
+    section_data = []
+    section_colors = ["#E6F3FF", "#E6FFE6", "#FFFFE6", "#FFE6F3", "#F3E6FF", "#FFF3E6"]
+    for i, section_name in enumerate(section_names):
+        section_df = processed_df[processed_df["Section"] == section_name]
+        total = len(section_df)
+        completed = int(section_df["Done"].sum()) if "Done" in section_df.columns else 0
+        percent = (completed / total * 100) if total > 0 else 0
+        section_data.append(
+            {
+                "name": section_name,
+                "total": total,
+                "completed": completed,
+                "percent": percent,
+                "color": section_colors[i % len(section_colors)],
+            }
+        )
+
+    donut_selected = st.session_state.selected_section if st.session_state.selected_section in section_names else section_names[0]
+    fig_options = build_pie_figure(section_data, donut_selected)
+    render_pie_with_progress(fig_options, section_data, donut_selected, section_names)
+    st.write("---")
 
 controls = st.columns([2, 1, 1])
 with controls[0]:
