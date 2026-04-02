@@ -1,5 +1,4 @@
 import os
-import traceback
 
 import pandas as pd
 import streamlit as st
@@ -242,8 +241,6 @@ else:
     if not show_section_col and "Section" in editor_df.columns:
         editor_df = editor_df.drop(columns=["Section"])
 
-    st.caption(f"Grid input: {len(editor_df)} rows x {len(editor_df.columns)} columns")
-
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     if AgGrid is None or GridOptionsBuilder is None or GridUpdateMode is None:
         st.error("AgGrid is not available. Install/repair streamlit-aggrid and reload the app.")
@@ -302,19 +299,6 @@ else:
             domLayout="normal",
         )
 
-        item_wrap_css = {
-            ".ag-theme-streamlit .ag-cell[col-id='Item']": {
-                "white-space": "normal !important",
-                "line-height": "1.25 !important",
-                "word-break": "break-word !important",
-            },
-            ".ag-theme-streamlit .ag-cell[col-id='Item'] .ag-cell-value": {
-                "white-space": "normal !important",
-                "line-height": "1.25 !important",
-                "word-break": "break-word !important",
-            },
-        }
-
         grid_response = AgGrid(
             editor_df,
             gridOptions=gb.build(),
@@ -324,13 +308,11 @@ else:
             update_mode=GridUpdateMode.VALUE_CHANGED,
             allow_unsafe_jscode=False,
             reload_data=False,
-            custom_css=item_wrap_css,
             key=f"checklist_aggrid_{selected_section}_{show_all}_{show_section_col}",
         )
         edited_df = pd.DataFrame(grid_response.get("data", editor_df))
     except Exception as err:
         st.error(f"AgGrid render error: {type(err).__name__}: {err}")
-        st.code(traceback.format_exc(), language="text")
         st.stop()
 
     if st.button("Save data", key="checklist_save_btn"):
