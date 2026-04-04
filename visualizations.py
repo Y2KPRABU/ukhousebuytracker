@@ -157,6 +157,7 @@ def render_checklist_html_table(df, show_section: bool = True) -> None:
     .cl-table tbody tr:hover td { background:#f0f9ff; }
     .cl-table tbody tr.done td { background:#d1fae5; }
     .cl-table .col-section { min-width:160px; font-weight:600; color:#1e40af; }
+    .cl-table .col-seq     { width:70px; text-align:center; font-weight:700; color:#0f172a; }
     .cl-table .col-item    { min-width:280px; }
     .cl-table .col-done    { text-align:center; width:50px; }
     .cl-table .col-cert    { text-align:center; width:90px; }
@@ -178,6 +179,7 @@ def render_checklist_html_table(df, show_section: bool = True) -> None:
         cert_icon = "\u2705" if cert else "\u2014"
         row_class = ' class="done"' if done else ''
         section  = _html.escape(str(row.get('Section', '')))
+        seq      = _html.escape(str(row.get('Row', '')))
         item     = _html.escape(str(row.get('Item', '')))
         pending  = _html.escape(str(row.get('Pending With', '') or ''))
         date_c   = _html.escape(str(row.get('Date Completed', '') or ''))
@@ -186,6 +188,7 @@ def render_checklist_html_table(df, show_section: bool = True) -> None:
         rows.append(
             f'<tr{row_class}>'
             f'{section_cell}'
+            f'<td class="col-seq">{seq}</td>'
             f'<td class="col-item"><div class="cell-wrap">{item}</div></td>'
             f'<td class="col-done">{done_icon}</td>'
             f'<td class="col-pending"><div class="cell-wrap">{pending}</div></td>'
@@ -197,7 +200,7 @@ def render_checklist_html_table(df, show_section: bool = True) -> None:
     section_header = '<th>Section</th>' if show_section else ''
     header = (
         '<thead><tr>'
-        f'{section_header}<th>Item</th><th>Done</th>'
+        f'{section_header}<th>Seq</th><th>Item</th><th>Done</th>'
         '<th>Pending With</th><th>Date Completed</th>'
         '<th>Notes</th><th>Certificate</th>'
         '</tr></thead>'
