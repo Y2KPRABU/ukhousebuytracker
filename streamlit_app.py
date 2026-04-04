@@ -219,7 +219,7 @@ with controls[1]:
     show_all = st.checkbox("Show all data", value=(selected_section == "All"), key="show_all")
 
 with controls[2]:
-    show_section_col = st.checkbox("Show Section column", value=True, key="show_section_col")
+    show_section_col = st.checkbox("Show Section column", value=False, key="show_section_col")
 
 if show_all or selected_section == "All":
     display_df = processed_df.copy()
@@ -236,7 +236,7 @@ else:
     if not show_section_col and "Section" in editor_df.columns:
         editor_df = editor_df.drop(columns=["Section"])
 
-    editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
+    editable_cols = ["Item", "Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     
     # Configure Item column with wider display for text wrapping
     col_config = {
