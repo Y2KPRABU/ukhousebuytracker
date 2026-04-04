@@ -73,6 +73,11 @@ div[data-testid*="stDataEditor"] [role="columnheader"] * {
     font-weight: 700 !important;
 }
 
+/* Glide Data Grid (canvas renderer) uses CSS variables for header font */
+.stDataFrameGlideDataEditor {
+    --gdg-header-font-style: 700 14px "Source Sans Pro", sans-serif;
+}
+
 /* Ensure first visible column (Section) wraps on table-based renderers */
 div[data-testid*="stDataFrame"] tbody tr td:first-child,
 div[data-testid*="stDataEditor"] tbody tr td:first-child {
