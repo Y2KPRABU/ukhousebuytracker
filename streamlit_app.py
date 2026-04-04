@@ -3,7 +3,6 @@ import json
 
 import pandas as pd
 import streamlit as st
-from streamlit import column_config
 
 from checklist_data import (
     load_checklist_json,
@@ -236,19 +235,13 @@ else:
     if not show_section_col and "Section" in editor_df.columns:
         editor_df = editor_df.drop(columns=["Section"])
 
-    editable_cols = ["Item", "Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
-    
-    # Configure Item column with 500px width for text wrapping
-    col_config = {
-        "Item": column_config.Column(width=500)
-    }
+    editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     
     edited_df = st.data_editor(
         editor_df,
         use_container_width=True,
         hide_index=True,
         disabled=[c for c in editor_df.columns if c not in editable_cols],
-        column_config=col_config,
         key="checklist_data_editor",
     )
 
