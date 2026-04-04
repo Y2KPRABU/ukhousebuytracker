@@ -1,7 +1,9 @@
 import os
+import json
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 from checklist_data import (
     load_checklist_json,
@@ -17,6 +19,63 @@ from visualizations import (
     apply_glass_effect_styling,
 )
 from sidebar_config import render_sidebar
+
+
+def render_tabulator_view(df: pd.DataFrame, height: int = 420) -> None:
+        """Render a read-only Tabulator table inside Streamlit with wrapped text."""
+        if df.empty:
+                st.info("No rows available for Tabulator view.")
+                return
+
+        records = df.fillna("").to_dict(orient="records")
+        columns = []
+        for col in df.columns:
+                col_def = {
+                        "title": col,
+                        "field": col,
+                        "headerSort": False,
+                        "resizable": True,
+                        "hozAlign": "center" if col in ("Done", "Tested certificate available") else "left",
+                }
+                if col in ("Done", "Tested certificate available"):
+                        col_def["formatter"] = "tickCross"
+                        col_def["formatterParams"] = {"allowEmpty": True}
+                if col == "Item":
+                        col_def["widthGrow"] = 3
+                columns.append(col_def)
+
+        html_code = f"""
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset='utf-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1'>
+            <link href='https://unpkg.com/tabulator-tables@6.2.5/dist/css/tabulator.min.css' rel='stylesheet'>
+            <style>
+                body {{ margin: 0; font-family: Segoe UI, Tahoma, sans-serif; }}
+                #tbl {{ width: 100%; }}
+                .tabulator .tabulator-cell {{ white-space: normal; word-break: break-word; line-height: 1.25; }}
+            </style>
+        </head>
+        <body>
+            <div id='tbl'></div>
+            <script src='https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js'></script>
+            <script>
+                const tableData = {json.dumps(records)};
+                const tableColumns = {json.dumps(columns)};
+                new Tabulator('#tbl', {{
+                    data: tableData,
+                    columns: tableColumns,
+                    layout: 'fitDataStretch',
+                    responsiveLayout: 'hide',
+                    height: '{height}px'
+                }});
+            </script>
+        </body>
+        </html>
+        """
+
+        components.html(html_code, height=height + 24, scrolling=True)
 
 
 def bootstrap_env_from_streamlit_secrets():
@@ -233,6 +292,10 @@ else:
     editor_df = display_df.copy()
     if not show_section_col and "Section" in editor_df.columns:
         editor_df = editor_df.drop(columns=["Section"])
+
+    with st.expander("Tabulator view", expanded=False):
+        st.caption("Tabulator grid is read-only in this Streamlit embed. Edit data in the table below.")
+        render_tabulator_view(editor_df, height=460)
 
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     edited_df = st.data_editor(
