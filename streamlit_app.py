@@ -247,11 +247,26 @@ else:
         editor_df = editor_df.drop(columns=["Section"])
 
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
+
+    # Glide editor supports a single row height value, so scale it for views with long Item text.
+    has_long_item_text = False
+    if "Item" in editor_df.columns:
+        has_long_item_text = (
+            editor_df["Item"]
+            .fillna("")
+            .astype(str)
+            .str.split()
+            .str.len()
+            .gt(10)
+            .any()
+        )
+    editor_row_height = 56 if has_long_item_text else 34
     
     edited_df = st.data_editor(
         editor_df,
         use_container_width=True,
         hide_index=True,
+        row_height=editor_row_height,
         disabled=[c for c in editor_df.columns if c not in editable_cols],
         key="checklist_data_editor",
     )
