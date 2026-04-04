@@ -163,6 +163,11 @@ def render_checklist_html_table(df) -> None:
     .cl-table .col-pending { min-width:120px; }
     .cl-table .col-date    { min-width:100px; }
     .cl-table .col-notes   { min-width:150px; }
+    .cl-table .cell-wrap {
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
     </style>
     """
     rows = []
@@ -180,11 +185,11 @@ def render_checklist_html_table(df) -> None:
         rows.append(
             f'<tr{row_class}>'
             f'<td class="col-section">{section}</td>'
-            f'<td class="col-item">{item}</td>'
+            f'<td class="col-item"><div class="cell-wrap">{item}</div></td>'
             f'<td class="col-done">{done_icon}</td>'
-            f'<td class="col-pending">{pending}</td>'
-            f'<td class="col-date">{date_c}</td>'
-            f'<td class="col-notes">{notes}</td>'
+            f'<td class="col-pending"><div class="cell-wrap">{pending}</div></td>'
+            f'<td class="col-date"><div class="cell-wrap">{date_c}</div></td>'
+            f'<td class="col-notes"><div class="cell-wrap">{notes}</div></td>'
             f'<td class="col-cert">{cert_icon}</td>'
             '</tr>'
         )

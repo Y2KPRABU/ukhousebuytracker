@@ -3,6 +3,13 @@ import json
 
 import pandas as pd
 import streamlit as st
+try:
+    from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
+except ImportError:
+    AgGrid = None
+    GridOptionsBuilder = None
+    GridUpdateMode = None
+    DataReturnMode = None
 
 from checklist_data import (
     load_checklist_json,
@@ -243,33 +250,73 @@ if display_df.empty:
     st.info("No checklist rows to display.")
 else:
     editor_df = display_df.copy()
-    if not show_section_col and "Section" in editor_df.columns:
-        editor_df = editor_df.drop(columns=["Section"])
-
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
 
-    # Glide editor supports a single row height value, so scale it for views with long Item text.
-    has_long_item_text = False
-    if "Item" in editor_df.columns:
-        has_long_item_text = (
-            editor_df["Item"]
-            .fillna("")
-            .astype(str)
-            .str.split()
-            .str.len()
-            .gt(10)
-            .any()
+    if AgGrid is None:
+        st.error("streamlit-aggrid is not available. Install 'streamlit-aggrid' to use wrapped editable grid.")
+        edited_df = editor_df.copy()
+    else:
+        gb = GridOptionsBuilder.from_dataframe(editor_df)
+        gb.configure_default_column(
+            editable=False,
+            resizable=True,
+            sortable=False,
+            filter=False,
         )
-    editor_row_height = 56 if has_long_item_text else 34
-    
-    edited_df = st.data_editor(
-        editor_df,
-        use_container_width=True,
-        hide_index=True,
-        row_height=editor_row_height,
-        disabled=[c for c in editor_df.columns if c not in editable_cols],
-        key="checklist_data_editor",
-    )
+
+        # Identity columns stay read-only for stable save mapping.
+        if "Section" in editor_df.columns:
+            gb.configure_column("Section", hide=not show_section_col, editable=False)
+        if "Row" in editor_df.columns:
+            gb.configure_column("Row", editable=False, width=90)
+        if "Item" in editor_df.columns:
+            gb.configure_column(
+                "Item",
+                editable=False,
+                wrapText=True,
+                autoHeight=True,
+                width=520,
+                cellStyle={"white-space": "normal", "line-height": "1.35"},
+            )
+        if "Initiator" in editor_df.columns:
+            gb.configure_column("Initiator", editable=False, width=220)
+
+        # Editable business columns.
+        for col in editable_cols:
+            if col in editor_df.columns:
+                gb.configure_column(col, editable=True)
+
+        if "Done" in editor_df.columns:
+            gb.configure_column("Done", cellEditor="agCheckboxCellEditor", width=95)
+        if "Tested certificate available" in editor_df.columns:
+            gb.configure_column("Tested certificate available", cellEditor="agCheckboxCellEditor", width=180)
+        if "Notes" in editor_df.columns:
+            gb.configure_column(
+                "Notes",
+                wrapText=True,
+                autoHeight=True,
+                width=360,
+                cellStyle={"white-space": "normal", "line-height": "1.35"},
+            )
+
+        grid_options = gb.build()
+        grid_options["rowHeight"] = 44
+        grid_options["headerHeight"] = 44
+        grid_options["domLayout"] = "normal"
+        grid_options["suppressRowTransform"] = True
+        grid_options["ensureDomOrder"] = True
+
+        grid_response = AgGrid(
+            editor_df,
+            gridOptions=grid_options,
+            update_mode=GridUpdateMode.VALUE_CHANGED,
+            data_return_mode=DataReturnMode.AS_INPUT,
+            fit_columns_on_grid_load=False,
+            allow_unsafe_jscode=True,
+            height=560,
+            key="checklist_aggrid",
+        )
+        edited_df = pd.DataFrame(grid_response.get("data", editor_df))
 
     if st.button("Save data", key="checklist_save_btn"):
         # Map edited rows back to session state using Section, Row, and Item as keys
