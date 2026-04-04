@@ -65,6 +65,14 @@ div[data-testid*="stDataEditor"] [role="gridcell"] > div {
     line-height: 1.35 !important;
 }
 
+/* Ensure data grid headers are bold and readable */
+div[data-testid*="stDataFrame"] [role="columnheader"],
+div[data-testid*="stDataEditor"] [role="columnheader"],
+div[data-testid*="stDataFrame"] [role="columnheader"] *,
+div[data-testid*="stDataEditor"] [role="columnheader"] * {
+    font-weight: 700 !important;
+}
+
 /* Ensure first visible column (Section) wraps on table-based renderers */
 div[data-testid*="stDataFrame"] tbody tr td:first-child,
 div[data-testid*="stDataEditor"] tbody tr td:first-child {
