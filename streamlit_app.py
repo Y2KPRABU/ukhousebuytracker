@@ -238,9 +238,9 @@ else:
 
     editable_cols = ["Item", "Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     
-    # Configure Item column with wider display for text wrapping
+    # Configure Item column with 500px width for text wrapping
     col_config = {
-        "Item": column_config.Column(width="large")
+        "Item": column_config.Column(width=500)
     }
     
     edited_df = st.data_editor(
