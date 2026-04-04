@@ -274,7 +274,6 @@ else:
                 "Item",
                 editable=False,
                 wrapText=True,
-                autoHeight=True,
                 width=520,
                 cellStyle={"white-space": "normal", "line-height": "1.35"},
             )
@@ -294,29 +293,38 @@ else:
             gb.configure_column(
                 "Notes",
                 wrapText=True,
-                autoHeight=True,
                 width=360,
                 cellStyle={"white-space": "normal", "line-height": "1.35"},
             )
 
         grid_options = gb.build()
-        grid_options["rowHeight"] = 44
+        grid_options["rowHeight"] = 72
         grid_options["headerHeight"] = 44
         grid_options["domLayout"] = "normal"
-        grid_options["suppressRowTransform"] = True
-        grid_options["ensureDomOrder"] = True
 
-        grid_response = AgGrid(
-            editor_df,
-            gridOptions=grid_options,
-            update_mode=GridUpdateMode.VALUE_CHANGED,
-            data_return_mode=DataReturnMode.AS_INPUT,
-            fit_columns_on_grid_load=False,
-            allow_unsafe_jscode=True,
-            height=560,
-            key="checklist_aggrid",
-        )
-        edited_df = pd.DataFrame(grid_response.get("data", editor_df))
+        try:
+            grid_response = AgGrid(
+                editor_df,
+                gridOptions=grid_options,
+                update_mode=GridUpdateMode.MODEL_CHANGED,
+                data_return_mode=DataReturnMode.AS_INPUT,
+                fit_columns_on_grid_load=True,
+                allow_unsafe_jscode=True,
+                theme="streamlit",
+                height=560,
+                key="checklist_aggrid",
+            )
+            edited_df = pd.DataFrame(grid_response.get("data", editor_df))
+        except Exception as exc:
+            st.warning(f"AgGrid render fallback activated: {exc}")
+            edited_df = st.data_editor(
+                editor_df,
+                use_container_width=True,
+                hide_index=True,
+                row_height=56,
+                disabled=[c for c in editor_df.columns if c not in editable_cols],
+                key="checklist_data_editor_fallback",
+            )
 
     if st.button("Save data", key="checklist_save_btn"):
         # Map edited rows back to session state using Section, Row, and Item as keys
