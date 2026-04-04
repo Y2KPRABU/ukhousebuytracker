@@ -1,360 +1,441 @@
 {
-  "Buyer Pre-Offer Stage": [
+  "1. Buyer Pre-Offer Stage": [
     {
+      "Row": 1,
       "Item": "Check your finances and get a mortgage agreement in principle (AIP)",
       "Initiator": "Buyer"
     },
     {
+      "Row": 2,
       "Item": "Once Address is Known, Even before Appointment, do the below",
       "Initiator": "Buyer"
     },
     {
+      "Row": 3,
       "Item": "Research the area, distance from schools, flood chance (https://check-long-term-flood-risk.service.gov.uk/postcode), crime rates",
       "Initiator": "Buyer"
     },
     {
+      "Row": 4,
       "Item": "Do subsidence checks, coal mine area, radon exposure checks, these are free to check online",
       "Initiator": "Buyer"
     },
     {
+      "Row": 5,
       "Item": "Above line may look simple, but stuff like coal mine and subsidence checks in paid reports make or break a decision, why wait for solicitors to ask for it and pay for it",
       "Initiator": "NA"
     },
     {
+      "Row": 6,
       "Item": "Download Energy Performance Certificate (EPC) online for free for the property, It shows AgeBand, when the property was built, and its built up area, energy rating",
       "Initiator": "Buyer"
     }
   ],
-  "Viewing Checks with Agent": [
+  "2. Viewing Checks with Agent": [
     {
+      "Row": 1,
       "Item": "Agents say we dont know to any of this, Solicitor will get this info, Just ask them you dont want to see the certificates, but absence of this means illegal constructions and council can fine you 50£ per day and ask you to demolish the extension, so you want to be sure about this before you make an offer !!!",
       "Initiator": "NA"
     },
     {
+      "Row": 2,
       "Item": "Check if House has New WC Room Added, Ensuite, Kitchen, Bathroom extensions",
       "Initiator": "Buyer"
     },
     {
+      "Row": 3,
       "Item": "Check for loft extensions",
       "Initiator": "Buyer"
     },
     {
+      "Row": 4,
       "Item": "Check for garage conversions/demolitions/conservatory extensions, some of these may not need planning permissions but may need building regulations",
       "Initiator": "Buyer"
     },
     {
+      "Row": 5,
       "Item": "If yes, Check if seller has Planning Permissions and Building Completion Certificates for above",
       "Initiator": "Buyer"
     },
     {
+      "Row": 6,
       "Item": "If No plans exist, Check for Reqularization certificate if work done without Planning Permission/Building Regulations",
       "Initiator": "Buyer"
     },
     {
+      "Row": 7,
       "Item": "Check for window/door replacements",
       "Initiator": "Buyer"
     },
     {
+      "Row": 8,
       "Item": "Check for FENSA certificates for glass doors/windows",
       "Initiator": "Buyer"
     },
     {
-      "Item": "If No plans exist, Check for Reqularization certificate if work done without Planning Permission/Building Regulations",
-      "Initiator": "Buyer"
-    },
-    {
+      "Row": 9,
+
+      "Row": 10,
       "Item": "Check for boiler replacements",
       "Initiator": "Buyer"
     },
     {
+      "Row": 11,
       "Item": "If yes, check for boiler Gas Safety installation certificate",
       "Initiator": "Buyer"
     },
     {
+      "Row": 12,
       "Item": "Check for rewiring/ electrical work done",
       "Initiator": "Buyer"
     },
     {
+      "Row": 13,
       "Item": "If yes, check for rewiring EIC/EICR certificates",
       "Initiator": "Buyer"
     },
     {
+      "Row": 14,
       "Item": "If Agents say no, Follow this up once Soicitor is instructed, mark it for follow up with solicitor, Mininum cost is 100 to 300£ for Solicitor instruction, ID checks, AML checks, and asking for these certificates, so you want to be sure about this before you make an offer !!!",
       "Initiator": "Buyer"
     }
   ],
-  "Offer Acceptance Stage with Agent": [
+  "3. Offer Acceptance Stage with Agent": [
     {
+      "Row": 1,
       "Item": "Agree on What is included in the sale (fixtures/fittings), This will need to be included in TA10 Form in future steps",
       "Initiator": "Buyer"
     },
     {
+      "Row": 2,
       "Item": "Agree on deposit amount and date",
       "Initiator": "Buyer"
     },
     {
+      "Row": 3,
       "Item": "Agree on tentative completion date",
       "Initiator": "Buyer"
     },
     {
+      "Row": 4,
       "Item": "1 day, Memorandum of Sale (from Agent)",
       "Initiator": "Agent"
     },
     {
+      "Row": 5,
       "Item": "1 to 2 days, ID & AML Checks (Passport/Address)",
       "Initiator": "Agent"
     },
     {
+      "Row": 6,
       "Item": "1 -3 days, Client Care Pack Sent from Agent to Buyer (Signed)",
       "Initiator": "Agent"
     },
     {
+      "Row": 7,
       "Item": "Agree offer and acceptance terms, fixtures,fittings, deposit, completion date, and ask agent to send you a written confirmation of these details, this will be useful for solicitor instructions and future reference",
       "Initiator": "Buyer"
     },
     {
+      "Row": 8,
       "Item": "Estate agent confirmation of agreed sale price",
       "Initiator": "Agent"
     },
     {
+      "Row": 9,
       "Item": "Register with conveyancer/solicitor - Cost 50-300£ Registration charges on Day 1 of instruction",
       "Initiator": "Buyer"
     },
     {
+      "Row": 10,
       "Item": "Instruct solicitor",
       "Initiator": "Buyer"
     }
   ],
-  "Buyer Solicitor Instructed": [
+  "4. Buyer Solicitor Instructed": [
     {
+      "Row": 1,
       "Item": "Most of these documents are received on day of instruction or within 3 days from Seller's Solicitor to Buyer's Solicitor, They dont send to Buyer, we have to ask them to send over",
       "Initiator": "NA"
     },
     {
+      "Row": 2,
       "Item": "Contract of Sale (Draft)",
       "Initiator": "Seller Solicitor sends to Buyer Solicitor"
     },
     {
+      "Row": 3,
       "Item": "Title Plan Contains a B/W map of the property and its boundaries",
       "Initiator": "Seller Solicitor sends to Buyer Solicitor"
     },
     {
+      "Row": 4,
       "Item": "Title Register Contains details of the property ownership and any restrictions or covenants",
       "Initiator": "Seller Solicitor sends to Buyer Solicitor"
     },
     {
+      "Row": 5,
       "Item": "Official Copy of Conveyance (OCON)",
       "Initiator": "Seller Solicitor sends to Buyer Solicitor"
     },
     {
+      "Row": 6,
       "Item": "Letter of Instruction (from Buyer Solicitor to Seller's Solicitor), Check your names spelling and address details are correct",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 7,
       "Item": "TA6 Property Information Form, Very important form, contains details about the property, its boundaries, rights of way, disputes, services, and other important information. Review this form carefully and raise any questions or concerns with the seller's solicitor.",
       "Initiator": "Seller Solicitor sends to Buyer Solicitor"
     },
     {
+      "Row": 8,
       "Item": "TA6 Section 5.1 a) is for Windows Door Additions, b) for extensions, i) for any other alterations (eg Added Ensuite or WC ) , if any of these are yes,  and check if they have planning permissions and building regulations certificates, if not ask for regularization certificate",
       "Initiator": "Buyer"
     },
     {
+      "Row": 9,
       "Item": "TA7 Leasehold Information Form (if applicable)",
       "Initiator": "Seller Solicitor sends to Buyer Solicitor"
     },
     {
+      "Row": 10,
       "Item": "TA10 Fittings and Contents Form, this form should match what you agreed with agent",
       "Initiator": "Seller Solicitor sends to Buyer Solicitor"
     }
   ],
-  "Buyer PreChecks Round 1 Negotiations": [
+  "5. Buyer PreChecks Round 1 Negotiations": [
     {
+      "Row": 1,
       "Item": "If Extensions or alterations are present, request planning permissions and regulation certificates",
       "Initiator": "Buyer via Buyer Solicitor"
     },
     {
+      "Row": 2,
       "Item": "Ask for FENSA certificates for New or replaced glass doors/windows, This is Structural integrity violation and can cause insurance and safety issues",
       "Initiator": "Buyer via Buyer Solicitor"
     },
     {
+      "Row": 3,
       "Item": "Ask for boiler Gas Safety installation certificate",
       "Initiator": "Buyer via Buyer Solicitor"
     },
     {
+      "Row": 4,
       "Item": "Ask for rewiring EIC/EICR certificates",
       "Initiator": "Buyer via Buyer Solicitor"
     },
     {
+      "Row": 5,
       "Item": "Collect boiler service records",
       "Initiator": "Buyer via Buyer Solicitor"
     },
     {
+      "Row": 6,
       "Item": "Negotiate on fixtures/fittings included based on above checks and other factors",
       "Initiator": "Buyer via Buyer Solicitor"
     },
     {
+      "Row": 7,
       "Item": "Check for missing test and certifcates from above step ",
       "Initiator": "Buyer"
     },
     {
+      "Row": 8,
       "Item": "Calculate cost for tests or regularization of building planning permissions , FENSA, Gas Safety, EICR, and other certificates",
       "Initiator": "Buyer"
     },
     {
+      "Row": 9,
       "Item": "Get Quotes from Builders for above missing certificates and regularization, and negotiate price reduction based on these costs",
       "Initiator": "Buyer"
     },
     {
+      "Row": 10,
       "Item": "Negotiate price based on above checks and other factors",
       "Initiator": "Buyer via Buyer Solicitor"
     }
   ],
-  "Survey & Reports": [
+  "6. Survey & Reports": [
     {
+      "Row": 1,
       "Item": "Arrange basic valuation survey (usually required by mortgage lender) or they do online valuation nowadays",
       "Initiator": "Buyer"
     },
     {
+      "Row": 2,
       "Item": "Buyer Paid 400 to 700£- Arrange RICS HomeBuyer report",
       "Initiator": "Buyer"
     },
     {
+      "Row": 3,
       "Item": "Review survey report (recommendations & costs)",
       "Initiator": "Buyer"
     },
     {
+      "Row": 4,
       "Item": "Raise repairs/search queries with seller solicitor through our (buyer) solicitor",
       "Initiator": "Buyer via Buyer Solicitor"
     },
     {
+      "Row": 5,
       "Item": "Review seller solicitor replies to above queries and survey report recommendations",
       "Initiator": "Buyer via Buyer Solicitor"
     }
   ],
-  "Second Round- Survey based Negotiations": [
+  "7. Second Round- Survey based Negotiations": [
     {
+      "Row": 1,
       "Item": "Negotiate price based on survey report recommendations and other factors",
       "Initiator": "Buyer"
     },
     {
+      "Row": 2,
       "Item": "Check for additional test and certifcates for any issues found in survey report, eg damp, woodworm, roof issues, structural issues, and ask for these to be provided by seller solicitor if not already provided ",
       "Initiator": "Buyer"
     },
     {
+      "Row": 3,
       "Item": "Calculate cost for tests or regularization of building planning permissions , FENSA, Gas Safety, EICR, and other certificates, and negotiate price reduction based on these costs if these certificates are not provided by seller solicitor",
       "Initiator": "Buyer"
     }
   ],
-  "Buyer Mortgage Application": [
+  "8. Buyer Mortgage Application": [
     {
+      "Row": 1,
       "Item": "Submit mortgage application with survey report and other documents",
       "Initiator": "Buyer"
     },
     {
+      "Row": 2,
       "Item": "Mortgage offer received and checked",
       "Initiator": "Buyer"
     },
     {
+      "Row": 3,
       "Item": "Mortgage offer accepted and returned to lender",
       "Initiator": "Buyer"
     }
   ],
-  "Order Paid Searches Now through Solicitor": [
+  "9. Order Paid Searches Now through Solicitor": [
     {
+      "Row": 1,
       "Item": "Local Authority Searches, Mandatory search that checks for planning permissions, building regulations, enforcement actions, and other local authority information related to the property",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 2,
       "Item": "Environmental Searches (ground stability, flood risk, contaminated land), Mandatory- if Mortgaged ",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 3,
       "Item": "Water and Drainage Search (checks if property is connected to mains water and sewerage, and if there are any public drains on the property) Mandatory- if Mortgaged",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 4,
       "Item": "Chancel Repair Liability Search",
       "Initiator": "Buyer Solicitor"
     }
   ],
-  "Buyer Solicitor Tasks": [
+  "10. Buyer Solicitor Tasks": [
     {
+      "Row": 1,
       "Item": "Analyses above paid search reports and creates a Report on Title (Read & Signed)",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 2,
       "Item": "Review replies to pre-contract enquiries",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 3,
       "Item": "Mortgage offer received in Portal and checked",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 4,
       "Item": "Mortgage offer accepted and returned to lender",
       "Initiator": "Buyer Solicitor"
     }
   ],
-  "Offers & Buyer Round 3 of Negotiation": [
+  "11. Offers & Buyer Round 3 of Negotiation": [
     {
+      "Row": 1,
       "Item": "Price negotiation completed",
       "Initiator": "Buyer"
     },
     {
+      "Row": 2,
       "Item": "Negotiated fixtures/fittings included",
       "Initiator": "Buyer"
     },
     {
+      "Row": 3,
       "Item": "Confirm deposit amount and date",
       "Initiator": "Buyer"
     },
     {
+      "Row": 4,
       "Item": "Agreement to completion date",
       "Initiator": "Buyer"
     },
     {
+      "Row": 5,
       "Item": "Draft contract of sale and send to seller solicitor",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 6,
       "Item": "Solicitor/master plan for exchange agreed",
       "Initiator": "Buyer Solicitor"
     }
   ],
-  "Exchange & Completion": [
+  "12. Exchange & Completion": [
     {
+      "Row": 1,
       "Item": "Buildings Insurance active from exchange date",
       "Initiator": "Buyer"
     },
     {
+      "Row": 2,
       "Item": "Transfer Deed (TR1) signed",
       "Initiator": "Buyer"
     },
     {
+      "Row": 3,
       "Item": "Mortgage deed signed",
       "Initiator": "Buyer"
     },
     {
+      "Row": 4,
       "Item": "Exchange contract and deposit paid",
       "Initiator": "Buyer"
     },
     {
+      "Row": 5,
       "Item": "Completion statement received",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 6,
       "Item": "Final search/priority searches done",
       "Initiator": "Buyer Solicitor"
     },
     {
+      "Row": 7,
       "Item": "Completion funds received by seller",
       "Initiator": "Seller Solicitor"
     },
     {
+      "Row": 8,
       "Item": "Keys collected",
       "Initiator": "Buyer"
     },
     {
+      "Row": 9,
       "Item": "Post-completion formalities (stamp duty, Land Registry)",
       "Initiator": "Buyer Solicitor"
     }

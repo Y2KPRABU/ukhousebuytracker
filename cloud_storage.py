@@ -14,6 +14,7 @@ except ImportError:
 
 EXPECTED_COLUMNS = [
     "Section",
+    "Row",
     "Item",
     "Initiator",
     "Done",

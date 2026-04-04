@@ -128,12 +128,16 @@ def load_sheet_to_df(spreadsheet_id, sheet_name, client):
     if not records:
         return pd.DataFrame()
     df = pd.DataFrame(records)
-    expected = ["Section", "Item", "Initiator", "Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
+    expected = ["Section", "Row", "Item", "Initiator", "Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
     missing = [col for col in expected if col not in df.columns]
     if missing:
-        # Backward compatibility for older sheets that predate Initiator.
-        if missing == ["Initiator"]:
-            df["Initiator"] = "NA"
+        # Backward compatibility for older sheets
+        if set(missing) <= {"Initiator", "Row"}:
+            if "Initiator" in missing:
+                df["Initiator"] = "NA"
+            if "Row" in missing:
+                # Regenerate Row numbers if missing
+                df["Row"] = df.groupby("Section").cumcount() + 1
         else:
             st.warning(f"Google Sheet missing columns: {missing}. Using JSON default schema.")
             return pd.DataFrame()
@@ -246,11 +250,34 @@ else:
     )
 
     if st.button("Save data", key="checklist_save_btn"):
+        # Map edited rows back to session state using Section, Row, and Item as keys
         if show_all or selected_section == "All":
-            st.session_state.checklist_df[editable_cols] = edited_df[editable_cols].values
+            # Update all rows
+            for idx, edited_row in edited_df.iterrows():
+                section = edited_row.get("Section", "")
+                row_num = edited_row.get("Row")
+                
+                # Find matching row in session state
+                mask = (st.session_state.checklist_df["Section"] == section)
+                if "Row" in st.session_state.checklist_df.columns:
+                    mask = mask & (st.session_state.checklist_df["Row"] == row_num)
+                
+                if mask.any():
+                    for col in editable_cols:
+                        if col in edited_row.index:
+                            st.session_state.checklist_df.loc[mask, col] = edited_row[col]
         else:
-            mask = st.session_state.checklist_df["Section"] == selected_section
-            st.session_state.checklist_df.loc[mask, editable_cols] = edited_df[editable_cols].values
+            # Update only rows in selected section
+            for idx, edited_row in edited_df.iterrows():
+                row_num = edited_row.get("Row")
+                mask = st.session_state.checklist_df["Section"] == selected_section
+                if "Row" in st.session_state.checklist_df.columns:
+                    mask = mask & (st.session_state.checklist_df["Row"] == row_num)
+                
+                if mask.any():
+                    for col in editable_cols:
+                        if col in edited_row.index:
+                            st.session_state.checklist_df.loc[mask, col] = edited_row[col]
 
         st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
 

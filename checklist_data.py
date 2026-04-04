@@ -43,15 +43,19 @@ def build_df_from_json(checklist_data: dict) -> pd.DataFrame:
     """Build a DataFrame with all required columns from the checklist dict."""
     def parse_item_entry(entry):
         if isinstance(entry, dict):
-            return str(entry.get("Item", "")).strip(), str(entry.get("Initiator", "NA")).strip() or "NA"
-        return str(entry), "NA"
+            row = entry.get("Row", 0)
+            item = str(entry.get("Item", "")).strip()
+            initiator = str(entry.get("Initiator", "NA")).strip() or "NA"
+            return row, item, initiator
+        return 0, str(entry), "NA"
 
     rows = []
     for section, items in checklist_data.items():
         for item in items:
-            item_text, initiator = parse_item_entry(item)
+            row_num, item_text, initiator = parse_item_entry(item)
             rows.append({
                 "Section": section,
+                "Row": row_num,
                 "Item": item_text,
                 "Initiator": initiator,
                 "Done": False,
@@ -65,19 +69,22 @@ def build_df_from_json(checklist_data: dict) -> pd.DataFrame:
 
 def reorder_by_json(df: pd.DataFrame, canonical_data: dict) -> pd.DataFrame:
     """Reorder DataFrame rows to match the section/item order defined in the JSON."""
-    def canonical_item_text(entry):
+    def canonical_item_data(entry):
         if isinstance(entry, dict):
-            return str(entry.get("Item", "")).strip()
-        return str(entry)
+            row_num = entry.get("Row", 0)
+            item_text = str(entry.get("Item", "")).strip()
+            return row_num, item_text
+        return 0, str(entry)
 
     order_map = {}
     idx = 0
     for section, items in canonical_data.items():
         for item in items:
-            order_map[(section, canonical_item_text(item))] = idx
+            row_num, item_text = canonical_item_data(item)
+            order_map[(section, row_num, item_text)] = idx
             idx += 1
     sort_keys = df.apply(
-        lambda row: order_map.get((row["Section"], row["Item"]), len(order_map)),
+        lambda row: order_map.get((row["Section"], row.get("Row", 0), row["Item"]), len(order_map)),
         axis=1,
     )
     return df.iloc[sort_keys.argsort(kind="stable")].reset_index(drop=True)
