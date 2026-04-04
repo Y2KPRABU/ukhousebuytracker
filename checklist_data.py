@@ -34,7 +34,8 @@ DEFAULT_CHECKLIST = {
 def load_checklist_json(data_file: str) -> dict:
     """Load checklist definition from a JSON file, falling back to DEFAULT_CHECKLIST."""
     if os.path.exists(data_file):
-        with open(data_file, "r", encoding="utf-8") as f:
+        # utf-8-sig gracefully handles UTF-8 files with/without BOM.
+        with open(data_file, "r", encoding="utf-8-sig") as f:
             return json.load(f)
     return DEFAULT_CHECKLIST
 
