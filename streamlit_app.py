@@ -168,10 +168,10 @@ if not section_names and "Section" in default_checklist_df.columns:
     section_names = [s for s in default_checklist_df["Section"].dropna().astype(str).unique().tolist() if s]
 
 if "selected_section" not in st.session_state:
-    st.session_state.selected_section = "All"
+    st.session_state.selected_section = section_names[0] if section_names else "All"
 
 if st.session_state.selected_section != "All" and st.session_state.selected_section not in section_names:
-    st.session_state.selected_section = "All"
+    st.session_state.selected_section = section_names[0] if section_names else "All"
 
 if section_names:
     section_data = []
@@ -207,7 +207,7 @@ with controls[0]:
     )
 
 with controls[1]:
-    show_all = st.checkbox("Show all data", value=(selected_section == "All"), key="show_all")
+    show_all = st.checkbox("Show all data", value=False, key="show_all")
     # Sync checkbox with section selection from donut clicks
     if selected_section != "All" and st.session_state.get("show_all"):
         st.session_state.show_all = False
