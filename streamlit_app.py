@@ -3,10 +3,6 @@ import json
 
 import pandas as pd
 import streamlit as st
-try:
-    from st_aggrid import AgGrid
-except ImportError:
-    AgGrid = None
 
 from checklist_data import (
     load_checklist_json,
@@ -19,6 +15,7 @@ from cloud_storage import build_store_from_env, load_for_user, save_for_user
 from visualizations import (
     build_pie_figure,
     render_pie_with_progress,
+    render_checklist_html_table,
     apply_glass_effect_styling,
 )
 from sidebar_config import render_sidebar
@@ -81,7 +78,6 @@ if not os.path.exists(DATA_FILE):
     st.warning(f"Checklist file '{DATA_FILE}' not found. Using default checklist.")
 
 
-cloud_store = build_store_from_env()
 default_checklist_df = build_df_from_json(data)
 
 if "checklist_df" not in st.session_state:
@@ -158,19 +154,7 @@ def write_df_to_sheet(df, spreadsheet_id, sheet_name, client):
     worksheet.update(values)
 
 
-# Render sidebar with cloud and Google Sheets configuration
-render_sidebar(
-    cloud_store,
-    default_checklist_df,
-    DATA_FILE,
-    DEFAULT_SHEET_NAME,
-    dataframe_signature,
-    get_gsheet_client,
-    load_sheet_to_df,
-    write_df_to_sheet,
-)
-
-# Main interactive editor hidden as per request
+# Read-only mode: hide account/cloud save controls and editing features.
 
 # Reorder rows to always match the JSON definition order before displaying
 st.session_state.checklist_df = reorder_by_json(st.session_state.checklist_df, data)
@@ -246,140 +230,7 @@ st.subheader(f"Checklist table: {'All sections' if show_all or selected_section 
 if display_df.empty:
     st.info("No checklist rows to display.")
 else:
-    editor_df = display_df.copy()
-    editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
-
-    # Always keep a working editor: try AgGrid first, then fall back to native data_editor.
-    edited_df = None
-    aggrid_silent_failure = False
-    if AgGrid is not None:
-        try:
-            column_defs = []
-            for col in editor_df.columns:
-                col_def = {
-                    "field": col,
-                    "editable": col in editable_cols,
-                    "resizable": True,
-                    "sortable": False,
-                    "filter": False,
-                }
-                if col == "Section":
-                    col_def["hide"] = not show_section_col
-                if col == "Row":
-                    col_def["width"] = 90
-                    col_def["editable"] = False
-                if col == "Item":
-                    col_def["editable"] = False
-                    col_def["minWidth"] = 460
-                    col_def["wrapText"] = True
-                    col_def["autoHeight"] = True
-                if col == "Initiator":
-                    col_def["editable"] = False
-                    col_def["minWidth"] = 210
-                if col == "Notes":
-                    col_def["wrapText"] = True
-                    col_def["autoHeight"] = True
-                    col_def["minWidth"] = 320
-                if col in ("Done", "Tested certificate available"):
-                    col_def["cellEditor"] = "agCheckboxCellEditor"
-                    col_def["cellRenderer"] = "agCheckboxCellRenderer"
-                column_defs.append(col_def)
-
-            grid_options = {
-                "columnDefs": column_defs,
-                "defaultColDef": {"resizable": True},
-                "headerHeight": 42,
-                "rowHeight": 44,
-                "suppressRowClickSelection": True,
-            }
-
-            grid_response = AgGrid(
-                editor_df,
-                gridOptions=grid_options,
-                update_mode="VALUE_CHANGED",
-                data_return_mode="AS_INPUT",
-                fit_columns_on_grid_load=True,
-                allow_unsafe_jscode=False,
-                theme="streamlit",
-                height=580,
-                key="checklist_aggrid",
-            )
-            edited_df = pd.DataFrame(grid_response.get("data", editor_df))
-            # Some AgGrid/browser combos fail silently and return empty data even with input rows.
-            if editor_df.shape[0] > 0 and edited_df.shape[0] == 0:
-                aggrid_silent_failure = True
-                edited_df = None
-        except Exception as exc:
-            st.warning(f"AgGrid failed, using native editor fallback: {exc}")
-
-    if edited_df is None:
-        if aggrid_silent_failure:
-            st.warning("AgGrid returned empty data. Using native editor fallback for stability.")
-        else:
-            st.info("Using native editor fallback for stability.")
-        edited_df = st.data_editor(
-            editor_df,
-            use_container_width=True,
-            hide_index=True,
-            row_height=56,
-            disabled=[c for c in editor_df.columns if c not in editable_cols],
-            key="checklist_data_editor_fallback",
-        )
-
-    if st.button("Save data", key="checklist_save_btn"):
-        # Map edited rows back to session state using Section, Row, and Item as keys
-        if show_all or selected_section == "All":
-            # Update all rows
-            for idx, edited_row in edited_df.iterrows():
-                section = edited_row.get("Section", "")
-                row_num = edited_row.get("Row")
-                
-                # Find matching row in session state
-                mask = (st.session_state.checklist_df["Section"] == section)
-                if "Row" in st.session_state.checklist_df.columns:
-                    mask = mask & (st.session_state.checklist_df["Row"] == row_num)
-                
-                if mask.any():
-                    for col in editable_cols:
-                        if col in edited_row.index:
-                            st.session_state.checklist_df.loc[mask, col] = edited_row[col]
-        else:
-            # Update only rows in selected section
-            for idx, edited_row in edited_df.iterrows():
-                row_num = edited_row.get("Row")
-                mask = st.session_state.checklist_df["Section"] == selected_section
-                if "Row" in st.session_state.checklist_df.columns:
-                    mask = mask & (st.session_state.checklist_df["Row"] == row_num)
-                
-                if mask.any():
-                    for col in editable_cols:
-                        if col in edited_row.index:
-                            st.session_state.checklist_df.loc[mask, col] = edited_row[col]
-
-        st.session_state.last_saved_signature = dataframe_signature(st.session_state.checklist_df)
-
-        current_user = st.session_state.get("cloud_user_input", "").strip() or st.session_state.active_user_id
-        if current_user:
-            ok, message = save_for_user(cloud_store, current_user, st.session_state.checklist_df)
-            if ok:
-                st.session_state.active_user_id = current_user
-                st.session_state.cloud_status = f"Saved to {cloud_store.backend_name}."
-            else:
-                st.session_state.cloud_status = f"Save failed: {message}"
-        else:
-            st.session_state.cloud_status = "Saved in app session. Set Account ID to persist to storage."
-
-        st.rerun()
-
-if st.session_state.autosave_cloud and st.session_state.active_user_id:
-    current_signature = dataframe_signature(st.session_state.checklist_df)
-    if current_signature != st.session_state.last_saved_signature:
-        ok, message = save_for_user(cloud_store, st.session_state.active_user_id, st.session_state.checklist_df)
-        if ok:
-            st.session_state.last_saved_signature = current_signature
-            st.session_state.cloud_status = f"Autosaved to {cloud_store.backend_name}."
-        else:
-            st.session_state.cloud_status = f"Autosave failed: {message}"
+    render_checklist_html_table(display_df, show_section=show_section_col)
 
 # no explicit progress info displayed now
 

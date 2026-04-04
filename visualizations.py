@@ -140,7 +140,7 @@ def render_pie_with_progress(fig_options, section_data, selected_section, sectio
                 st.rerun()
 
 
-def render_checklist_html_table(df) -> None:
+def render_checklist_html_table(df, show_section: bool = True) -> None:
     """Render checklist DataFrame as a styled HTML table with full text wrapping."""
     TABLE_CSS = """
     <style>
@@ -182,9 +182,10 @@ def render_checklist_html_table(df) -> None:
         pending  = _html.escape(str(row.get('Pending With', '') or ''))
         date_c   = _html.escape(str(row.get('Date Completed', '') or ''))
         notes    = _html.escape(str(row.get('Notes', '') or ''))
+        section_cell = f'<td class="col-section">{section}</td>' if show_section else ''
         rows.append(
             f'<tr{row_class}>'
-            f'<td class="col-section">{section}</td>'
+            f'{section_cell}'
             f'<td class="col-item"><div class="cell-wrap">{item}</div></td>'
             f'<td class="col-done">{done_icon}</td>'
             f'<td class="col-pending"><div class="cell-wrap">{pending}</div></td>'
@@ -193,9 +194,10 @@ def render_checklist_html_table(df) -> None:
             f'<td class="col-cert">{cert_icon}</td>'
             '</tr>'
         )
+    section_header = '<th>Section</th>' if show_section else ''
     header = (
         '<thead><tr>'
-        '<th>Section</th><th>Item</th><th>Done</th>'
+        f'{section_header}<th>Item</th><th>Done</th>'
         '<th>Pending With</th><th>Date Completed</th>'
         '<th>Notes</th><th>Certificate</th>'
         '</tr></thead>'
