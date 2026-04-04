@@ -4,12 +4,9 @@ import json
 import pandas as pd
 import streamlit as st
 try:
-    from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
+    from st_aggrid import AgGrid
 except ImportError:
     AgGrid = None
-    GridOptionsBuilder = None
-    GridUpdateMode = None
-    DataReturnMode = None
 
 from checklist_data import (
     load_checklist_json,
@@ -252,79 +249,74 @@ else:
     editor_df = display_df.copy()
     editable_cols = ["Done", "Pending With", "Date Completed", "Notes", "Tested certificate available"]
 
-    if AgGrid is None:
-        st.error("streamlit-aggrid is not available. Install 'streamlit-aggrid' to use wrapped editable grid.")
-        edited_df = editor_df.copy()
-    else:
-        gb = GridOptionsBuilder.from_dataframe(editor_df)
-        gb.configure_default_column(
-            editable=False,
-            resizable=True,
-            sortable=False,
-            filter=False,
-        )
-
-        # Identity columns stay read-only for stable save mapping.
-        if "Section" in editor_df.columns:
-            gb.configure_column("Section", hide=not show_section_col, editable=False)
-        if "Row" in editor_df.columns:
-            gb.configure_column("Row", editable=False, width=90)
-        if "Item" in editor_df.columns:
-            gb.configure_column(
-                "Item",
-                editable=False,
-                wrapText=True,
-                width=520,
-                cellStyle={"white-space": "normal", "line-height": "1.35"},
-            )
-        if "Initiator" in editor_df.columns:
-            gb.configure_column("Initiator", editable=False, width=220)
-
-        # Editable business columns.
-        for col in editable_cols:
-            if col in editor_df.columns:
-                gb.configure_column(col, editable=True)
-
-        if "Done" in editor_df.columns:
-            gb.configure_column("Done", cellEditor="agCheckboxCellEditor", width=95)
-        if "Tested certificate available" in editor_df.columns:
-            gb.configure_column("Tested certificate available", cellEditor="agCheckboxCellEditor", width=180)
-        if "Notes" in editor_df.columns:
-            gb.configure_column(
-                "Notes",
-                wrapText=True,
-                width=360,
-                cellStyle={"white-space": "normal", "line-height": "1.35"},
-            )
-
-        grid_options = gb.build()
-        grid_options["rowHeight"] = 72
-        grid_options["headerHeight"] = 44
-        grid_options["domLayout"] = "normal"
-
+    # Always keep a working editor: try AgGrid first, then fall back to native data_editor.
+    edited_df = None
+    if AgGrid is not None:
         try:
+            column_defs = []
+            for col in editor_df.columns:
+                col_def = {
+                    "field": col,
+                    "editable": col in editable_cols,
+                    "resizable": True,
+                    "sortable": False,
+                    "filter": False,
+                }
+                if col == "Section":
+                    col_def["hide"] = not show_section_col
+                if col == "Row":
+                    col_def["width"] = 90
+                    col_def["editable"] = False
+                if col == "Item":
+                    col_def["editable"] = False
+                    col_def["minWidth"] = 460
+                    col_def["wrapText"] = True
+                    col_def["autoHeight"] = True
+                if col == "Initiator":
+                    col_def["editable"] = False
+                    col_def["minWidth"] = 210
+                if col == "Notes":
+                    col_def["wrapText"] = True
+                    col_def["autoHeight"] = True
+                    col_def["minWidth"] = 320
+                if col in ("Done", "Tested certificate available"):
+                    col_def["cellEditor"] = "agCheckboxCellEditor"
+                    col_def["cellRenderer"] = "agCheckboxCellRenderer"
+                column_defs.append(col_def)
+
+            grid_options = {
+                "columnDefs": column_defs,
+                "defaultColDef": {"resizable": True},
+                "headerHeight": 42,
+                "rowHeight": 44,
+                "suppressRowClickSelection": True,
+            }
+
             grid_response = AgGrid(
                 editor_df,
                 gridOptions=grid_options,
-                update_mode=GridUpdateMode.MODEL_CHANGED,
-                data_return_mode=DataReturnMode.AS_INPUT,
+                update_mode="VALUE_CHANGED",
+                data_return_mode="AS_INPUT",
                 fit_columns_on_grid_load=True,
-                allow_unsafe_jscode=True,
+                allow_unsafe_jscode=False,
                 theme="streamlit",
-                height=560,
+                height=580,
                 key="checklist_aggrid",
             )
             edited_df = pd.DataFrame(grid_response.get("data", editor_df))
         except Exception as exc:
-            st.warning(f"AgGrid render fallback activated: {exc}")
-            edited_df = st.data_editor(
-                editor_df,
-                use_container_width=True,
-                hide_index=True,
-                row_height=56,
-                disabled=[c for c in editor_df.columns if c not in editable_cols],
-                key="checklist_data_editor_fallback",
-            )
+            st.warning(f"AgGrid failed, using native editor fallback: {exc}")
+
+    if edited_df is None:
+        st.info("Using native editor fallback for stability.")
+        edited_df = st.data_editor(
+            editor_df,
+            use_container_width=True,
+            hide_index=True,
+            row_height=56,
+            disabled=[c for c in editor_df.columns if c not in editable_cols],
+            key="checklist_data_editor_fallback",
+        )
 
     if st.button("Save data", key="checklist_save_btn"):
         # Map edited rows back to session state using Section, Row, and Item as keys
