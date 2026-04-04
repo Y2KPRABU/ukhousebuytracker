@@ -220,6 +220,13 @@ with controls[0]:
 
 with controls[1]:
     show_all = st.checkbox("Show all data", value=(selected_section == "All"), key="show_all")
+    # Sync checkbox with section selection from donut clicks
+    if selected_section != "All" and st.session_state.get("show_all"):
+        st.session_state.show_all = False
+        st.rerun()
+    elif selected_section == "All" and not st.session_state.get("show_all"):
+        st.session_state.show_all = True
+        st.rerun()
 
 with controls[2]:
     show_section_col = st.checkbox("Show Section column", value=False, key="show_section_col")
