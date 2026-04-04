@@ -251,6 +251,7 @@ else:
 
     # Always keep a working editor: try AgGrid first, then fall back to native data_editor.
     edited_df = None
+    aggrid_silent_failure = False
     if AgGrid is not None:
         try:
             column_defs = []
@@ -304,11 +305,18 @@ else:
                 key="checklist_aggrid",
             )
             edited_df = pd.DataFrame(grid_response.get("data", editor_df))
+            # Some AgGrid/browser combos fail silently and return empty data even with input rows.
+            if editor_df.shape[0] > 0 and edited_df.shape[0] == 0:
+                aggrid_silent_failure = True
+                edited_df = None
         except Exception as exc:
             st.warning(f"AgGrid failed, using native editor fallback: {exc}")
 
     if edited_df is None:
-        st.info("Using native editor fallback for stability.")
+        if aggrid_silent_failure:
+            st.warning("AgGrid returned empty data. Using native editor fallback for stability.")
+        else:
+            st.info("Using native editor fallback for stability.")
         edited_df = st.data_editor(
             editor_df,
             use_container_width=True,
